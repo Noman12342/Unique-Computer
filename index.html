@@ -102,6 +102,16 @@
                 </div>
                 <span id="dash-low-stock-count" class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">0</span>
             </div>
+            
+            <!-- Top Selling Items -->
+            <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i>Top Selling Items</h3>
+                <div id="dash-top-selling" class="space-y-3">
+                    <p class="text-center text-gray-400 text-sm">No data available</p>
+                </div>
+            </div>
+
+            <!-- Recent Sales -->
             <div class="bg-white rounded-xl shadow-sm p-4">
                 <h3 class="font-bold text-gray-700 mb-3 border-b pb-2">Recent Sales (24h)</h3>
                 <div id="dash-recent-list" class="space-y-3">
@@ -194,7 +204,7 @@
         <!-- *** HISTORY TAB *** -->
         <section id="tab-history" class="view-section hidden">
              <div class="bg-white p-3 rounded-lg shadow-sm mb-4 flex justify-between items-center">
-                 <h2 class="font-bold text-gray-700">This Month's Sales</h2>
+                 <h2 class="font-bold text-gray-700">Recent Activity</h2>
                  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full" id="history-month-label">...</span>
              </div>
              <div id="history-list" class="space-y-3 pb-10"></div>
@@ -205,8 +215,13 @@
             <h2 class="text-xl font-bold text-gray-800 mb-4 px-2">Financial Overview</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-blue-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Revenue</p>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Revenue (Net)</p>
                     <h3 class="text-lg font-bold text-blue-600" id="acc-revenue">৳0</h3>
+                </div>
+                <!-- ADDED: Missing Total Withdraw Card -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-red-500">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Withdrawn</p>
+                    <h3 class="text-lg font-bold text-red-600" id="acc-total-withdraw">৳0</h3>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-purple-500">
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Investment</p>
@@ -221,13 +236,13 @@
                     <h3 class="text-lg font-bold text-orange-600" id="acc-dues">৳0</h3>
                 </div>
             </div>
+            
             <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
                 <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-users mr-2"></i>Partnership Status</h3>
                 <!-- Noman -->
                 <div class="mb-4">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-gray-800">Noman (40%)</span>
-                        <!-- Removed Share Display as requested -->
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         <span>Withdrawn: <span id="acc-withdrawn-noman" class="text-red-500 font-semibold">৳0</span></span>
@@ -238,7 +253,6 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-gray-800">Rayan (60%)</span>
-                        <!-- Removed Share Display as requested -->
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         <span>Withdrawn: <span id="acc-withdrawn-rayan" class="text-red-500 font-semibold">৳0</span></span>
@@ -290,14 +304,13 @@
                 <button onclick="generateReport()" class="w-full bg-blue-600 text-white py-2 rounded text-sm font-bold shadow">Search Report</button>
             </div>
             <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
-                <h3 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-list mr-2"></i>All Sales History</h3>
+                <h3 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-list mr-2"></i>All Sales & Withdrawals</h3>
                 <div class="overflow-x-auto max-h-80 overflow-y-auto mb-3 border rounded border-gray-200 hide-scrollbar">
                     <table class="w-full text-xs text-left whitespace-nowrap">
                         <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th class="p-2 border-b">Date</th>
-                                <th class="p-2 border-b">Inv#</th>
-                                <th class="p-2 border-b">Customer</th>
+                                <th class="p-2 border-b">Details</th>
                                 <th class="p-2 border-b text-right">Amount</th>
                             </tr>
                         </thead>
@@ -314,7 +327,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
                     <div class="border p-2 rounded">
-                        <span class="block text-gray-500">Total Sales</span>
+                        <span class="block text-gray-500">Net Revenue (Sales - WD)</span>
                         <span class="block text-lg font-bold text-blue-600" id="rpt-total-sales">৳0</span>
                     </div>
                     <div class="border p-2 rounded">
@@ -357,7 +370,7 @@
         </button>
     </nav>
 
-    <!-- Modals -->
+    <!-- Modals (Same as before) -->
     <div id="modal-product" class="modal fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50">
         <div class="modal-content bg-white w-full sm:w-96 rounded-t-2xl sm:rounded-xl p-5 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">Add/Edit Product</h3><button onclick="closeModal('modal-product')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button></div>
@@ -418,19 +431,10 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzYbPaW6Ai-mtwI7Qtp232RhQQBDqXY6uNgzWrBUt9wan2CPpAbA2htGpHk0YCYuBuPOQ/exec";
         
-        // Data State
-        let products = [];
-        let sales = [];
-        let withdrawals = [];
-        let cart = [];
-        let posSelectedItem = null;
-        let lastActiveTab = 'dashboard'; 
+        let products = [], sales = [], withdrawals = [], cart = [], posSelectedItem = null, lastActiveTab = 'dashboard'; 
 
-        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
-            fetchAllData(); // Initial Load
-            
-            // Default Dates
+            fetchAllData(); 
             const today = new Date();
             const localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             document.getElementById('pos-date').value = localDate;
@@ -439,119 +443,61 @@
         });
 
         // --- API INTEGRATION ---
-        
         async function fetchAllData() {
             showLoader(true);
             try {
                 const response = await fetch(`${API_URL}?action=getAll`);
                 const data = await response.json();
-                
                 products = data.products || [];
                 sales = data.sales || [];
                 withdrawals = data.withdrawals || [];
-                
-                // Ensure stock is number
                 products.forEach(p => p.stock = parseInt(p.stock));
-                
                 refreshAllViews();
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                alert("Failed to load data. Check internet connection.");
-            } finally {
-                showLoader(false);
-            }
+            } catch (error) { console.error("Fetch Error:", error); alert("Failed to load data."); } 
+            finally { showLoader(false); }
         }
 
         async function postData(action, payload) {
             showLoader(true);
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Apps Script specific constraint for simpler fetch
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: action, payload: payload })
-                });
-                // Since mode is no-cors, we can't read response. We assume success if no error thrown.
-                // Re-fetch data to ensure sync
-                await fetchAllData(); 
-                showToast('Success!');
-                return true;
-            } catch (error) {
-                console.error("Post Error:", error);
-                alert("Operation failed. Check internet.");
-                showLoader(false);
-                return false;
-            }
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, payload }) });
+                await fetchAllData(); showToast('Success!');
+            } catch (error) { console.error("Post Error:", error); alert("Operation failed."); showLoader(false); }
         }
 
         async function postDataWithId(action, id, extraData = {}) {
              showLoader(true);
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: action, id: id, ...extraData })
-                });
-                await fetchAllData();
-                showToast('Success!');
-                return true;
-            } catch (error) {
-                 console.error("Post Error:", error);
-                alert("Operation failed.");
-                showLoader(false);
-                return false;
-            }
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, id, ...extraData }) });
+                await fetchAllData(); showToast('Success!');
+            } catch (error) { console.error("Post Error:", error); alert("Operation failed."); showLoader(false); }
         }
 
-        function showLoader(show) {
-            const loader = document.getElementById('loader-overlay');
-            if(show) {
-                loader.classList.remove('hidden');
-                loader.style.display = 'flex';
-            } else {
-                loader.style.display = 'none';
-            }
-        }
+        function showLoader(show) { document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none'; }
 
         function refreshAllViews() {
             renderDashboard();
             if(!document.getElementById('tab-inventory').classList.contains('hidden')) renderInventory();
             if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
-            if(!document.getElementById('tab-accounts').classList.contains('hidden')) {
-                updateAccountStats();
-                renderAllSalesHistory();
-            }
+            if(!document.getElementById('tab-accounts').classList.contains('hidden')) { updateAccountStats(); renderAllSalesHistory(); }
         }
 
-        // --- Navigation ---
         function switchTab(tabId) {
-            const navBar = document.getElementById('bottom-nav');
-            const accBtn = document.getElementById('btn-account-nav');
-            
+            const navBar = document.getElementById('bottom-nav'), accBtn = document.getElementById('btn-account-nav');
             if (tabId === 'accounts') {
                 navBar.classList.add('hidden');
                 accBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-1"></i> Back';
                 accBtn.setAttribute('onclick', `switchTab('${lastActiveTab}')`);
-                accBtn.classList.replace('bg-blue-700', 'bg-gray-700');
-                accBtn.classList.replace('hover:bg-blue-800', 'hover:bg-gray-800');
+                accBtn.classList.replace('bg-blue-700', 'bg-gray-700'); accBtn.classList.replace('hover:bg-blue-800', 'hover:bg-gray-800');
             } else {
                 lastActiveTab = tabId;
                 navBar.classList.remove('hidden');
                 accBtn.innerHTML = '<i class="fa-solid fa-chart-pie mr-1"></i> Accounts';
                 accBtn.setAttribute('onclick', "switchTab('accounts')");
-                accBtn.classList.replace('bg-gray-700', 'bg-blue-700');
-                accBtn.classList.replace('hover:bg-gray-800', 'hover:bg-blue-800');
-                
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.classList.remove('text-blue-600');
-                    btn.classList.add('text-gray-400');
-                });
+                accBtn.classList.replace('bg-gray-700', 'bg-blue-700'); accBtn.classList.replace('hover:bg-gray-800', 'hover:bg-blue-800');
+                document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('text-blue-600'); btn.classList.add('text-gray-400'); });
                 const activeBtn = document.querySelector(`.nav-btn[data-target="${tabId}"]`);
-                if(activeBtn) {
-                    activeBtn.classList.remove('text-gray-400');
-                    activeBtn.classList.add('text-blue-600');
-                }
+                if(activeBtn) { activeBtn.classList.remove('text-gray-400'); activeBtn.classList.add('text-blue-600'); }
             }
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -559,28 +505,15 @@
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.remove('opacity-0', 'translate-y-[-20px]');
-            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-[-20px]'); }, 2000);
-        }
+        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.remove('opacity-0', 'translate-y-[-20px]'); setTimeout(() => t.classList.add('opacity-0', 'translate-y-[-20px]'), 2000); }
         function generateId() { return Math.floor(100000 + Math.random() * 900000).toString(); }
-        function formatDate(isoString) {
-            const d = new Date(isoString);
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-        }
-        function formatSimpleDate(isoString) {
-            const d = new Date(isoString);
-            return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        }
+        function formatDate(isoString) { const d = new Date(isoString); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`; }
+        function formatSimpleDate(isoString) { const d = new Date(isoString); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`; }
 
         // --- Inventory ---
         function renderInventory() {
             const search = document.getElementById('inv-search').value.toLowerCase();
-            const list = document.getElementById('inv-product-list');
-            list.innerHTML = '';
-            // Fixed: Convert name and code to String before lowercase to prevent crash on numbers
+            const list = document.getElementById('inv-product-list'); list.innerHTML = '';
             const filtered = products.filter(p => String(p.name).toLowerCase().includes(search) || (p.code && String(p.code).toLowerCase().includes(search)));
             filtered.forEach(p => {
                 const stockDisplay = p.isService ? '<span class="text-blue-500 font-bold">Service</span>' : `Stock: ${p.stock}`;
@@ -594,12 +527,10 @@
         document.getElementById('inv-search').addEventListener('input', renderInventory);
         
         function openProductModal(editId = null) {
-            const modal = document.getElementById('modal-product');
-            const form = document.getElementById('product-form');
-            form.reset();
-            document.getElementById('prod-id').value = '';
+            const modal = document.getElementById('modal-product'), form = document.getElementById('product-form');
+            form.reset(); document.getElementById('prod-id').value = '';
             if (editId) {
-                const p = products.find(x => x.id == editId); // Loose equality for ID string/int mix
+                const p = products.find(x => x.id == editId);
                 document.getElementById('prod-id').value = p.id;
                 document.getElementById('prod-name').value = p.name;
                 document.getElementById('prod-code').value = p.code || '';
@@ -609,20 +540,16 @@
                 document.getElementById('prod-stock').value = p.stock || 0;
                 document.getElementById('prod-service').checked = p.isService;
             }
-            toggleStockField();
-            modal.classList.add('active');
+            toggleStockField(); modal.classList.add('active');
         }
         function editProduct(id) { openProductModal(id); }
         function toggleStockField() {
-            const isService = document.getElementById('prod-service').checked;
-            const container = document.getElementById('stock-field-container');
-            if (isService) { container.classList.add('opacity-50', 'pointer-events-none'); document.getElementById('prod-stock').value = 0; } 
-            else { container.classList.remove('opacity-50', 'pointer-events-none'); }
+            const isService = document.getElementById('prod-service').checked, container = document.getElementById('stock-field-container');
+            if (isService) { container.classList.add('opacity-50', 'pointer-events-none'); document.getElementById('prod-stock').value = 0; } else { container.classList.remove('opacity-50', 'pointer-events-none'); }
         }
         async function saveProduct(e) {
             e.preventDefault();
             const id = document.getElementById('prod-id').value;
-            const isService = document.getElementById('prod-service').checked;
             const product = {
                 id: id || Date.now().toString(),
                 name: document.getElementById('prod-name').value,
@@ -630,42 +557,25 @@
                 size: document.getElementById('prod-size').value,
                 buyPrice: parseFloat(document.getElementById('prod-buy').value),
                 sellPrice: parseFloat(document.getElementById('prod-sell').value),
-                stock: isService ? 999999 : parseInt(document.getElementById('prod-stock').value),
-                isService: isService
+                stock: document.getElementById('prod-service').checked ? 999999 : parseInt(document.getElementById('prod-stock').value),
+                isService: document.getElementById('prod-service').checked
             };
-            if (id) {
-                 await postData('updateProduct', product);
-            } else {
-                 await postData('addProduct', product);
-            }
+            if (id) await postData('updateProduct', product); else await postData('addProduct', product);
             closeModal('modal-product');
         }
-        async function deleteProduct(id) {
-            if(confirm('Are you sure?')) {
-                await postDataWithId('deleteProduct', id);
-            }
-        }
+        async function deleteProduct(id) { if(confirm('Are you sure?')) await postDataWithId('deleteProduct', id); }
 
         // --- POS ---
-        function openProductSelectModal() {
-            document.getElementById('modal-product-select').classList.add('active');
-            document.getElementById('pos-search').value = '';
-            document.getElementById('pos-search').focus();
-            renderPosSearch();
-        }
+        function openProductSelectModal() { document.getElementById('modal-product-select').classList.add('active'); document.getElementById('pos-search').value = ''; document.getElementById('pos-search').focus(); renderPosSearch(); }
         function renderPosSearch() {
             const term = document.getElementById('pos-search').value.toLowerCase();
-            const container = document.getElementById('pos-search-results');
-            container.innerHTML = '';
-            // Fixed: Convert name and code to String before lowercase to prevent crash on numbers
+            const container = document.getElementById('pos-search-results'); container.innerHTML = '';
             const filtered = products.filter(p => String(p.name).toLowerCase().includes(term) || (p.code && String(p.code).toLowerCase().includes(term)));
             filtered.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded border border-gray-200 active:bg-blue-50 cursor-pointer flex justify-between';
                 item.onclick = () => selectPosItem(p);
-                const stockInfo = p.isService ? 'Service' : `Stock: ${p.stock}`;
-                const stockColor = (!p.isService && p.stock <= 0) ? 'text-red-500' : 'text-gray-500';
-                item.innerHTML = `<div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-500">${p.code || ''}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${p.sellPrice}</div><div class="text-xs ${stockColor}">${stockInfo}</div></div>`;
+                item.innerHTML = `<div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-500">${p.code || ''}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${p.sellPrice}</div><div class="text-xs ${(!p.isService && p.stock<=0)?'text-red-500':'text-gray-500'}">${p.isService?'Service':`Stock: ${p.stock}`}</div></div>`;
                 container.appendChild(item);
             });
         }
@@ -677,42 +587,23 @@
             document.getElementById('pos-edit-price').value = product.sellPrice;
             document.getElementById('pos-edit-qty').value = 1;
             document.getElementById('pos-edit-total-input').value = product.sellPrice;
-            closeModal('modal-product-select');
-            document.getElementById('pos-editor').classList.remove('hidden');
+            closeModal('modal-product-select'); document.getElementById('pos-editor').classList.remove('hidden');
         }
-        function updatePosCalculations() {
-            const price = parseFloat(document.getElementById('pos-edit-price').value) || 0;
-            const qty = parseInt(document.getElementById('pos-edit-qty').value) || 1;
-            document.getElementById('pos-edit-total-input').value = price * qty;
-        }
+        function updatePosCalculations() { document.getElementById('pos-edit-total-input').value = parseFloat(document.getElementById('pos-edit-price').value) * parseInt(document.getElementById('pos-edit-qty').value); }
         function updateUnitFromTotal() {
-            const total = parseFloat(document.getElementById('pos-edit-total-input').value) || 0;
-            const qty = parseInt(document.getElementById('pos-edit-qty').value) || 1;
-            if(qty > 0) {
-                const newUnitPrice = total / qty;
-                document.getElementById('pos-edit-price').value = Number.isInteger(newUnitPrice) ? newUnitPrice : newUnitPrice.toFixed(2);
-            }
+            const qty = parseInt(document.getElementById('pos-edit-qty').value);
+            if(qty > 0) { const unit = parseFloat(document.getElementById('pos-edit-total-input').value)/qty; document.getElementById('pos-edit-price').value = Number.isInteger(unit)?unit:unit.toFixed(2); }
         }
-        function adjustPosQty(delta) {
-            const input = document.getElementById('pos-edit-qty');
-            let val = parseInt(input.value) || 0; val += delta; if(val < 1) val = 1; input.value = val;
-            updatePosCalculations();
-        }
+        function adjustPosQty(d) { const i = document.getElementById('pos-edit-qty'); let v = parseInt(i.value)||0; v+=d; if(v<1)v=1; i.value=v; updatePosCalculations(); }
         function addToCart() {
             if(!posSelectedItem) return;
-            const price = parseFloat(document.getElementById('pos-edit-price').value);
-            const qty = parseInt(document.getElementById('pos-edit-qty').value);
-            const total = parseFloat(document.getElementById('pos-edit-total-input').value);
+            const price = parseFloat(document.getElementById('pos-edit-price').value), qty = parseInt(document.getElementById('pos-edit-qty').value), total = parseFloat(document.getElementById('pos-edit-total-input').value);
             if(!posSelectedItem.isService && qty > posSelectedItem.stock) { alert(`Insufficient Stock! Max available: ${posSelectedItem.stock}`); return; }
-            cart.push({ ...posSelectedItem, sellPrice: price, qty: qty, total: total });
-            document.getElementById('pos-editor').classList.add('hidden');
-            posSelectedItem = null;
-            renderCart();
+            cart.push({ ...posSelectedItem, sellPrice: price, qty, total });
+            document.getElementById('pos-editor').classList.add('hidden'); posSelectedItem = null; renderCart();
         }
         function renderCart() {
-            const list = document.getElementById('pos-cart-list');
-            list.innerHTML = '';
-            let grandTotal = 0;
+            const list = document.getElementById('pos-cart-list'); list.innerHTML = ''; let grandTotal = 0;
             cart.forEach((item, idx) => {
                 grandTotal += item.total;
                 const div = document.createElement('div');
@@ -725,155 +616,129 @@
         }
         function removeFromCart(idx) { cart.splice(idx, 1); renderCart(); }
         function clearCart() { cart = []; renderCart(); }
-        
         async function completeSale() {
             if(cart.length === 0) { showToast('Cart is empty!'); return; }
-            if(!confirm("Are you sure you want to complete this sale?")) return;
-
-            const total = cart.reduce((acc, item) => acc + item.total, 0);
-            const custName = document.getElementById('pos-cust-name').value || 'Walk-in Customer';
-            const custMobile = document.getElementById('pos-cust-mobile').value || '';
-            const custAddress = document.getElementById('pos-cust-address').value || '';
-            const payMethod = document.getElementById('pos-pay-method').value;
-            const dateInput = document.getElementById('pos-date').value;
-
-            // Date Handling
+            if(!confirm("Are you sure?")) return;
+            const total = cart.reduce((acc, item) => acc + item.total, 0), custName = document.getElementById('pos-cust-name').value || 'Walk-in Customer';
+            const payMethod = document.getElementById('pos-pay-method').value, dateInput = document.getElementById('pos-date').value;
             let finalDateObj = new Date();
-            if(dateInput) {
-                const now = new Date();
-                const timeString = now.toTimeString().split(' ')[0];
-                finalDateObj = new Date(dateInput + 'T' + timeString);
-            }
+            if(dateInput) { const now = new Date(); finalDateObj = new Date(dateInput + 'T' + now.toTimeString().split(' ')[0]); }
             const isPaid = payMethod !== 'Due';
-            
-            const sale = {
-                id: generateId(),
-                date: finalDateObj.toISOString(),
-                paidAt: isPaid ? finalDateObj.toISOString() : null,
-                items: cart,
-                total: total,
-                customer: custName,
-                customerMobile: custMobile,
-                customerAddress: custAddress,
-                paymentMethod: payMethod,
-                status: isPaid ? 'Paid' : 'Due'
-            };
-            
-            // Stock Update Logic - Sent separately or handle via API. 
-            // For simplicity with this Apps Script, we use 'updateStockBatch' action
+            const sale = { id: generateId(), date: finalDateObj.toISOString(), paidAt: isPaid ? finalDateObj.toISOString() : null, items: cart, total, customer: custName, customerMobile: document.getElementById('pos-cust-mobile').value, customerAddress: document.getElementById('pos-cust-address').value, paymentMethod: payMethod, status: isPaid ? 'Paid' : 'Due' };
             const stockUpdates = cart.filter(c => !c.isService).map(c => ({ id: c.id, qty: c.qty }));
-            
             await postData('addSale', sale);
-            if(stockUpdates.length > 0) {
-                 await postData('updateStockBatch', stockUpdates);
-            }
-
-            cart = [];
-            document.getElementById('pos-cust-name').value = '';
-            document.getElementById('pos-cust-mobile').value = '';
-            document.getElementById('pos-cust-address').value = '';
-            // Reset Date
-            const today = new Date();
-            document.getElementById('pos-date').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            
-            renderCart();
-            showInvoice(sale.id); // Note: Sales array won't have new item until fetch finishes, so showInvoice might fail if not re-fetched.
-            // Actually showInvoice relies on 'sales' array. We must wait for fetch.
-            // Since postData calls fetchAllData, 'sales' will be updated.
-            // We just need to find the sale by ID again.
-            // Small Delay to ensure fetch completes? postData awaits fetchAllData, so it should be fine.
+            if(stockUpdates.length > 0) await postData('updateStockBatch', stockUpdates);
+            cart = []; document.getElementById('pos-cust-name').value = ''; 
+            const today = new Date(); document.getElementById('pos-date').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            renderCart(); showInvoice(sale.id);
         }
 
         // --- History & Invoice ---
         function renderHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
+            const now = new Date(), currentMonth = now.getMonth(), currentYear = now.getFullYear();
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             document.getElementById('history-month-label').innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
-            const filteredSales = sales.filter(s => {
-                const d = new Date(s.date);
-                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-            }).sort((a,b) => new Date(b.date) - new Date(a.date));
+            // Combine Sales and Withdrawals for the history list
+            let mixedHistory = [];
 
-            if(filteredSales.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 py-4">No sales this month</p>'; return; }
-            filteredSales.forEach(s => {
-                const badgeColor = s.status === 'Due' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+            // 1. Add Sales
+            sales.forEach(s => {
+                const effDate = (s.status === 'Paid' && s.paidAt) ? new Date(s.paidAt) : new Date(s.date);
+                if (effDate.getMonth() === currentMonth && effDate.getFullYear() === currentYear) {
+                    mixedHistory.push({ type: 'sale', data: s, date: effDate });
+                }
+            });
+
+            // 2. Add Withdrawals
+            withdrawals.forEach(w => {
+                const wDate = new Date(w.date);
+                if (wDate.getMonth() === currentMonth && wDate.getFullYear() === currentYear) {
+                    mixedHistory.push({ type: 'withdraw', data: w, date: wDate });
+                }
+            });
+
+            // Sort by Date Descending
+            mixedHistory.sort((a,b) => b.date - a.date);
+
+            if(mixedHistory.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 py-4">No activity this month</p>'; return; }
+
+            mixedHistory.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center cursor-pointer active:bg-gray-50';
-                div.onclick = () => showInvoice(s.id);
-                div.innerHTML = `<div><div class="font-bold text-gray-800">#${s.id} <span class="text-xs font-normal text-gray-500">(${s.customer})</span></div><div class="text-xs text-gray-400">${formatDate(s.date)}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${s.total}</div><span class="text-[10px] px-2 py-0.5 rounded-full ${badgeColor}">${s.paymentMethod}</span></div>`;
+                
+                if (item.type === 'sale') {
+                    const s = item.data;
+                    const badgeColor = s.status === 'Due' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800';
+                    div.onclick = () => showInvoice(s.id);
+                    div.innerHTML = `<div><div class="font-bold text-gray-800">#${s.id} <span class="text-xs font-normal text-gray-500">(${s.customer})</span></div><div class="text-xs text-gray-400">${formatDate(s.date)}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${s.total}</div><span class="text-[10px] px-2 py-0.5 rounded-full ${badgeColor}">${s.paymentMethod}</span></div>`;
+                } else {
+                    const w = item.data;
+                    div.innerHTML = `<div><div class="font-bold text-red-700">Withdrawal</div><div class="text-xs text-gray-500">${w.partner} - ${formatDate(w.date)}</div></div><div class="text-right"><div class="font-bold text-red-600">- ৳${w.amount}</div><span class="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600">Debit</span></div>`;
+                }
                 list.appendChild(div);
             });
         }
+
         let currentInvoiceId = null;
         function showInvoice(id) {
-            const sale = sales.find(s => s.id == id); // Loose equality
-            if(!sale) return;
+            const sale = sales.find(s => s.id == id); if(!sale) return;
             currentInvoiceId = id;
-            document.getElementById('inv-id').innerText = '#' + sale.id;
-            document.getElementById('inv-date').innerText = formatDate(sale.date);
-            let custHTML = `<div>${sale.customer}</div>`;
-            if(sale.customerMobile) custHTML += `<div class="text-xs font-normal text-gray-500">Mob: ${sale.customerMobile}</div>`;
-            if(sale.customerAddress) custHTML += `<div class="text-xs font-normal text-gray-500">Addr: ${sale.customerAddress}</div>`;
+            document.getElementById('inv-id').innerText = '#' + sale.id; document.getElementById('inv-date').innerText = formatDate(sale.date);
+            let custHTML = `<div>${sale.customer}</div>`; if(sale.customerMobile) custHTML += `<div class="text-xs text-gray-500">Mob: ${sale.customerMobile}</div>`;
             document.getElementById('inv-customer-details').innerHTML = custHTML;
-            document.getElementById('inv-total').innerText = '৳' + sale.total;
-            document.getElementById('inv-method').innerText = sale.paymentMethod;
-            const tbody = document.getElementById('inv-items');
-            tbody.innerHTML = '';
-            sale.items.forEach(item => {
-                const sizeText = item.size ? `<span class="text-[10px] text-gray-500">(${item.size})</span>` : '';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="pb-1">${item.name} ${sizeText}</td><td class="pb-1 text-center">${item.qty}</td><td class="pb-1 text-right">${item.total}</td>`;
-                tbody.appendChild(tr);
-            });
-            const payBtn = document.getElementById('btn-pay-due');
-            if(sale.status === 'Due') { payBtn.classList.remove('hidden'); } else { payBtn.classList.add('hidden'); }
+            document.getElementById('inv-total').innerText = '৳' + sale.total; document.getElementById('inv-method').innerText = sale.paymentMethod;
+            const tbody = document.getElementById('inv-items'); tbody.innerHTML = '';
+            sale.items.forEach(i => { tbody.innerHTML += `<tr><td class="pb-1">${i.name}</td><td class="pb-1 text-center">${i.qty}</td><td class="pb-1 text-right">${i.total}</td></tr>`; });
+            if(sale.status === 'Due') document.getElementById('btn-pay-due').classList.remove('hidden'); else document.getElementById('btn-pay-due').classList.add('hidden');
             document.getElementById('modal-invoice').classList.add('active');
         }
-        function printInvoice() {
-            document.body.classList.add('printing-invoice');
-            window.print();
-            setTimeout(() => { document.body.classList.remove('printing-invoice'); }, 500);
-        }
-        async function payDue() {
-            if(!currentInvoiceId) return;
-            if(!confirm("Are you sure you want to mark this Due as PAID?")) return;
-            // API call to update status
-            await postDataWithId('updateSaleStatus', currentInvoiceId, { paidAt: new Date().toISOString() });
-            closeModal('modal-invoice');
-        }
+        function printInvoice() { document.body.classList.add('printing-invoice'); window.print(); setTimeout(() => document.body.classList.remove('printing-invoice'), 500); }
+        async function payDue() { if(!currentInvoiceId)return; if(!confirm("Mark as PAID?"))return; await postDataWithId('updateSaleStatus', currentInvoiceId, { paidAt: new Date().toISOString() }); closeModal('modal-invoice'); }
 
-        // --- Dashboard ---
+        // --- Dashboard & Accounts ---
         function renderDashboard() {
             const today = new Date().toDateString();
-            const todaysSales = sales.filter(s => new Date(s.date).toDateString() === today);
-            const totalToday = todaysSales.reduce((acc, s) => acc + (parseInt(s.total)||0), 0);
-            document.getElementById('dash-today-sales').innerText = '৳' + totalToday;
-            const dueSales = sales.filter(s => s.status === 'Due');
-            const totalDue = dueSales.reduce((acc, s) => acc + (parseInt(s.total)||0), 0);
-            document.getElementById('dash-total-due').innerText = '৳' + totalDue;
-            const lowStockCount = products.filter(p => !p.isService && p.stock < 5).length;
-            document.getElementById('dash-low-stock-count').innerText = lowStockCount;
-            const recentList = document.getElementById('dash-recent-list');
-            recentList.innerHTML = '';
-            const recents = [...sales].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-            recents.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between text-sm border-b pb-2 last:border-0';
-                div.innerHTML = `<div><span class="font-bold text-gray-700">#${s.id}</span><span class="text-gray-500 text-xs ml-1">${s.customer}</span></div><div class="font-bold text-gray-600">৳${s.total}</div>`;
-                recentList.appendChild(div);
+            const totalToday = sales.reduce((acc, s) => {
+                const sTotal = parseFloat(s.total) || 0;
+                const saleDate = new Date(s.date).toDateString();
+                const paidDate = s.paidAt ? new Date(s.paidAt).toDateString() : null;
+                if (saleDate === today) return acc + sTotal;
+                if (s.status === 'Paid' && paidDate === today) return acc + sTotal;
+                return acc;
+            }, 0);
+            document.getElementById('dash-today-sales').innerText = '৳' + Math.round(totalToday).toLocaleString();
+            const totalDue = sales.filter(s => s.status === 'Due').reduce((acc, s) => acc + (parseFloat(s.total)||0), 0);
+            document.getElementById('dash-total-due').innerText = '৳' + Math.round(totalDue).toLocaleString();
+            document.getElementById('dash-low-stock-count').innerText = products.filter(p => !p.isService && p.stock < 5).length;
+            renderTopSelling();
+            // Recent List
+            const recentList = document.getElementById('dash-recent-list'); recentList.innerHTML = '';
+            [...sales].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5).forEach(s => {
+                recentList.innerHTML += `<div class="flex justify-between text-sm border-b pb-2 last:border-0"><div><span class="font-bold text-gray-700">#${s.id}</span><span class="text-gray-500 text-xs ml-1">${s.customer}</span></div><div class="font-bold text-gray-600">৳${s.total}</div></div>`;
             });
         }
+
+        function renderTopSelling() {
+            const container = document.getElementById('dash-top-selling'); container.innerHTML = '';
+            const counts = {}; let totalQty = 0;
+            sales.forEach(s => {
+                let items = s.items; if(typeof items==='string'){try{items=JSON.parse(items)}catch(e){items=[]}}
+                if(Array.isArray(items)) items.forEach(i => { const q = parseInt(i.qty)||0; if(q>0){ counts[i.name] = (counts[i.name]||0)+q; totalQty+=q; } });
+            });
+            const sorted = Object.entries(counts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count).slice(0,5);
+            if(sorted.length===0) { container.innerHTML='<p class="text-center text-gray-400 text-sm">No data</p>'; return; }
+            sorted.forEach(i => {
+                const pct = totalQty>0 ? ((i.count/totalQty)*100).toFixed(1) : 0;
+                container.innerHTML += `<div class="flex items-center justify-between text-sm"><div class="flex-1"><div class="flex justify-between mb-1"><span class="font-medium text-gray-700">${i.name}</span><span class="text-gray-500 text-xs">${i.count} Sold (${pct}%)</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-blue-600 h-2 rounded-full" style="width: ${pct}%"></div></div></div></div>`;
+            });
+        }
+
         function openDueListModal() {
-            const list = document.getElementById('due-list-content');
-            list.innerHTML = '';
-            const dueSales = sales.filter(s => s.status === 'Due');
-            if(dueSales.length === 0) list.innerHTML = '<p class="text-gray-400">No pending dues.</p>';
-            dueSales.forEach(s => {
+            const list = document.getElementById('due-list-content'); list.innerHTML = '';
+            sales.filter(s => s.status === 'Due').forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'bg-gray-50 p-2 rounded flex justify-between items-center cursor-pointer hover:bg-gray-100 transition border border-gray-100';
                 div.onclick = () => { showInvoice(s.id); closeModal('modal-due-list'); };
@@ -883,103 +748,101 @@
             document.getElementById('modal-due-list').classList.add('active');
         }
         function openLowStockModal() {
-            const list = document.getElementById('low-stock-content');
-            list.innerHTML = '';
-            const lowItems = products.filter(p => !p.isService && p.stock < 5);
-            if(lowItems.length === 0) list.innerHTML = '<p class="text-gray-400">Stock levels are good.</p>';
-            lowItems.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'bg-red-50 p-2 rounded flex justify-between items-center border border-red-100';
-                div.innerHTML = `<div class="font-bold text-gray-700">${p.name}</div><div class="text-red-600 font-bold bg-white px-2 rounded border border-red-200">${p.stock} left</div>`;
-                list.appendChild(div);
+            const list = document.getElementById('low-stock-content'); list.innerHTML = '';
+            products.filter(p => !p.isService && p.stock < 5).forEach(p => {
+                list.innerHTML += `<div class="bg-red-50 p-2 rounded flex justify-between items-center border border-red-100"><div class="font-bold text-gray-700">${p.name}</div><div class="text-red-600 font-bold bg-white px-2 rounded border border-red-200">${p.stock} left</div></div>`;
             });
             document.getElementById('modal-low-stock').classList.add('active');
         }
 
-        // --- Accounts ---
         function updateAccountStats() {
             const investment = products.reduce((acc, p) => acc + ((p.isService ? 0 : p.stock) * p.buyPrice), 0);
             document.getElementById('acc-investment').innerText = '৳' + investment.toLocaleString();
-            const revenue = sales.reduce((acc, s) => (s.status === 'Paid') ? acc + (parseInt(s.total)||0) : acc, 0);
-            document.getElementById('acc-revenue').innerText = '৳' + revenue.toLocaleString();
+            
+            // Gross Revenue (Only Paid Sales)
+            const grossRevenue = sales.reduce((acc, s) => (s.status === 'Paid') ? acc + (parseInt(s.total)||0) : acc, 0);
+            
+            // Total Withdrawals
+            const totalWithdrawals = withdrawals.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
+            document.getElementById('acc-total-withdraw').innerText = '৳' + totalWithdrawals.toLocaleString();
+
+            // Net Revenue (Displayed as Main Revenue)
+            // Logic: User requested "withdrawal korle seta total revenue theke bad jabe"
+            const netRevenue = grossRevenue - totalWithdrawals;
+            document.getElementById('acc-revenue').innerText = '৳' + netRevenue.toLocaleString();
+
+            // Gross Profit
             let totalCost = 0;
             sales.forEach(sale => {
                 if(sale.status === 'Paid') {
-                    sale.items.forEach(item => {
-                        const original = products.find(p => p.id == item.id);
-                        if(original) { totalCost += (original.buyPrice * item.qty); }
-                    });
+                    sale.items.forEach(item => { const original = products.find(p => p.id == item.id); if(original) totalCost += (original.buyPrice * item.qty); });
                 }
             });
-            const grossProfit = revenue - totalCost;
+            // Note: Profit is usually on Sales, not net cash flow, but simplified here.
+            const grossProfit = grossRevenue - totalCost;
             document.getElementById('acc-gross-profit').innerText = '৳' + grossProfit.toLocaleString();
+            
             const totalDue = sales.filter(s => s.status === 'Due').reduce((acc, s) => acc + (parseInt(s.total)||0), 0);
             document.getElementById('acc-dues').innerText = '৳' + totalDue.toLocaleString();
             
-            const shareNoman = revenue * 0.40;
-            const shareRayan = revenue * 0.60;
-            const withdrawnNoman = withdrawals.filter(w => w.partner === 'Noman').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
-            const withdrawnRayan = withdrawals.filter(w => w.partner === 'Rayan').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
+            // Partnership
+            const shareNoman = grossRevenue * 0.40; // Share based on Gross Revenue (Fairness)
+            const shareRayan = grossRevenue * 0.60;
+            // Fixed variable name wdNoman and wdRayan here
+            const wdNoman = withdrawals.filter(w => w.partner === 'Noman').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
+            const wdRayan = withdrawals.filter(w => w.partner === 'Rayan').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             
-            // Share Display Removed
-            // document.getElementById('acc-share-noman').innerText = ...
-            document.getElementById('acc-withdrawn-noman').innerText = '৳' + withdrawnNoman.toLocaleString(undefined, {maximumFractionDigits:0});
-            const balNoman = shareNoman - withdrawnNoman;
+            document.getElementById('acc-withdrawn-noman').innerText = '৳' + wdNoman.toLocaleString();
+            const balNoman = shareNoman - wdNoman;
             document.getElementById('acc-balance-noman').innerText = '৳' + balNoman.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('acc-balance-noman').className = balNoman < 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
 
-            // Share Display Removed
-            // document.getElementById('acc-share-rayan').innerText = ...
-            document.getElementById('acc-withdrawn-rayan').innerText = '৳' + withdrawnRayan.toLocaleString(undefined, {maximumFractionDigits:0});
-            const balRayan = shareRayan - withdrawnRayan;
+            document.getElementById('acc-withdrawn-rayan').innerText = '৳' + wdRayan.toLocaleString();
+            const balRayan = shareRayan - wdRayan;
             document.getElementById('acc-balance-rayan').innerText = '৳' + balRayan.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('acc-balance-rayan').className = balRayan < 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
         }
-        
+
         async function addWithdrawal() {
-            const partner = document.getElementById('wd-partner').value;
-            const amount = parseFloat(document.getElementById('wd-amount').value);
-            const dateInput = document.getElementById('wd-date').value;
-            if(!amount || amount <= 0) { alert("Please enter a valid amount"); return; }
-            if(confirm(`Confirm withdrawal of ৳${amount} for ${partner}?`)) {
+            const partner = document.getElementById('wd-partner').value, amount = parseFloat(document.getElementById('wd-amount').value), dateInput = document.getElementById('wd-date').value;
+            if(!amount || amount <= 0) { alert("Invalid amount"); return; }
+            if(confirm(`Confirm withdrawal?`)) {
                 let finalDateObj = new Date();
-                if(dateInput) {
-                    const now = new Date();
-                    const timeString = now.toTimeString().split(' ')[0];
-                    finalDateObj = new Date(dateInput + 'T' + timeString);
-                }
-                const wd = {
-                    id: Date.now().toString(),
-                    date: finalDateObj.toISOString(),
-                    partner: partner,
-                    amount: amount
-                };
-                await postData('addWithdrawal', wd);
+                if(dateInput) { const now = new Date(); finalDateObj = new Date(dateInput + 'T' + now.toTimeString().split(' ')[0]); }
+                await postData('addWithdrawal', { id: Date.now().toString(), date: finalDateObj.toISOString(), partner, amount });
                 document.getElementById('wd-amount').value = '';
-                const today = new Date();
-                document.getElementById('wd-date').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             }
         }
+
         function renderAllSalesHistory() {
-            const list = document.getElementById('acc-all-sales-list');
-            list.innerHTML = '';
-            const sortedSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
-            if(sortedSales.length === 0) { list.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Record</td></tr>'; return; }
-            sortedSales.forEach(s => {
+            const list = document.getElementById('acc-all-sales-list'); list.innerHTML = '';
+            
+            let mixedHistory = [];
+            sales.forEach(s => mixedHistory.push({ type: 'sale', data: s, date: new Date(s.date) }));
+            withdrawals.forEach(w => mixedHistory.push({ type: 'withdraw', data: w, date: new Date(w.date) }));
+            mixedHistory.sort((a,b) => b.date - a.date);
+
+            if(mixedHistory.length === 0) { list.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Data</td></tr>'; return; }
+            
+            mixedHistory.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition";
-                tr.title = "Click to view/print invoice";
-                tr.onclick = () => showInvoice(s.id);
-                tr.innerHTML = `<td class="p-2">${formatSimpleDate(s.date)}</td><td class="p-2 text-blue-600 font-bold">#${s.id}</td><td class="p-2 truncate max-w-[80px]">${s.customer}</td><td class="p-2 text-right font-semibold">৳${s.total}</td>`;
+                if (item.type === 'sale') {
+                    const s = item.data;
+                    tr.className = "border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition";
+                    tr.onclick = () => showInvoice(s.id);
+                    tr.innerHTML = `<td class="p-2">${formatSimpleDate(s.date)}</td><td class="p-2 text-blue-600 font-bold">#${s.id} <span class="text-gray-400 text-[10px]">(${s.customer})</span></td><td class="p-2 text-right font-semibold">৳${s.total}</td>`;
+                } else {
+                    const w = item.data;
+                    tr.className = "border-b border-red-50 bg-red-50";
+                    tr.innerHTML = `<td class="p-2">${formatSimpleDate(w.date)}</td><td class="p-2 font-bold text-red-600">Withdrawal <span class="text-gray-500 text-[10px]">(${w.partner})</span></td><td class="p-2 text-right font-bold text-red-600">- ৳${w.amount}</td>`;
+                }
                 list.appendChild(tr);
             });
         }
+
         function generateReport() {
-            const month = document.getElementById('report-month').value;
-            const yearVal = document.getElementById('report-year').value;
-            const area = document.getElementById('report-print-area');
-            const salesBody = document.getElementById('rpt-sales-table');
-            const wdBody = document.getElementById('rpt-withdraw-table');
+            const month = document.getElementById('report-month').value, yearVal = document.getElementById('report-year').value;
+            const area = document.getElementById('report-print-area'), salesBody = document.getElementById('rpt-sales-table'), wdBody = document.getElementById('rpt-withdraw-table');
             const isYearMatch = (d) => yearVal === 'all' ? true : d.getFullYear() === parseInt(yearVal);
             const isMonthMatch = (d) => month === 'all' ? true : d.getMonth() === parseInt(month);
             
@@ -992,43 +855,33 @@
                 }
             });
             let filteredWd = withdrawals.filter(w => { const d = new Date(w.date); return isYearMatch(d) && isMonthMatch(d); });
+            let totalWd = filteredWd.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
 
+            // Period Label Logic
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            let periodText = "";
-            if (yearVal === 'all' && month === 'all') periodText = "All Time History";
-            else if (yearVal === 'all') periodText = `Month: ${monthNames[month]} (All Years)`;
-            else if (month === 'all') periodText = `Year: ${yearVal}`;
-            else periodText = `${monthNames[month]} ${yearVal}`;
+            let periodText = (yearVal === 'all' && month === 'all') ? "All Time History" : (yearVal === 'all' ? `Month: ${monthNames[month]}` : (month === 'all' ? `Year: ${yearVal}` : `${monthNames[month]} ${yearVal}`));
             document.getElementById('report-period-label').innerText = `Period: ${periodText}`;
 
+            // Render Sales Table
             salesBody.innerHTML = '';
             filteredSales.forEach(s => {
-                const tr = document.createElement('tr'); tr.className = "border-b";
                 const statusBadge = s.status === 'Due' ? '<span class="text-red-500 font-bold">Due</span>' : '<span class="text-green-600">Paid</span>';
-                tr.innerHTML = `<td class="p-2">#${s.id}</td><td class="p-2">${formatSimpleDate(s.date)}</td><td class="p-2">${s.customer}<div class="text-[10px] text-gray-400">${s.paymentMethod}</div></td><td class="p-2 text-right"><div>৳${s.total}</div><div class="text-[10px]">${statusBadge}</div></td>`;
-                salesBody.appendChild(tr);
+                salesBody.innerHTML += `<tr class="border-b"><td class="p-2">#${s.id}</td><td class="p-2">${formatSimpleDate(s.date)}</td><td class="p-2">${s.customer}<div class="text-[10px] text-gray-400">${s.paymentMethod}</div></td><td class="p-2 text-right"><div>৳${s.total}</div><div class="text-[10px]">${statusBadge}</div></td></tr>`;
             });
             if(filteredSales.length === 0) salesBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Created</td></tr>';
 
+            // Render Withdraw Table
             wdBody.innerHTML = '';
-            let totalWd = 0;
             filteredWd.forEach(w => {
-                totalWd += (parseInt(w.amount)||0);
-                const tr = document.createElement('tr'); tr.className = "border-b";
-                tr.innerHTML = `<td class="p-2">${formatSimpleDate(w.date)}</td><td class="p-2 font-semibold">${w.partner}</td><td class="p-2 text-right">৳${w.amount}</td>`;
-                wdBody.appendChild(tr);
+                wdBody.innerHTML += `<tr class="border-b"><td class="p-2">${formatSimpleDate(w.date)}</td><td class="p-2 font-semibold">${w.partner}</td><td class="p-2 text-right">৳${w.amount}</td></tr>`;
             });
             if(filteredWd.length === 0) wdBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400">No Withdrawals Found</td></tr>';
             
-            document.getElementById('rpt-total-sales').innerText = '৳' + revenue.toLocaleString();
+            document.getElementById('rpt-total-sales').innerText = '৳' + (revenue - totalWd).toLocaleString(); // Net Revenue displayed in Report
             document.getElementById('rpt-total-withdraw').innerText = '৳' + totalWd.toLocaleString();
             area.classList.remove('hidden');
         }
-        function printReport() {
-            document.body.classList.add('printing-report');
-            window.print();
-            setTimeout(() => { document.body.classList.remove('printing-report'); }, 500);
-        }
+        function printReport() { document.body.classList.add('printing-report'); window.print(); setTimeout(() => document.body.classList.remove('printing-report'), 500); }
     </script>
 </body>
 </html>
