@@ -222,21 +222,23 @@
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
-                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-users mr-2"></i>Partnership (On Revenue)</h3>
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-2"><i class="fa-solid fa-users mr-2"></i>Partnership Status</h3>
+                <!-- Noman -->
                 <div class="mb-4">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-gray-800">Noman (40%)</span>
-                        <span class="text-xs bg-blue-100 text-blue-800 px-2 rounded">Share: <span id="acc-share-noman">৳0</span></span>
+                        <!-- Removed Share Display as requested -->
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         <span>Withdrawn: <span id="acc-withdrawn-noman" class="text-red-500 font-semibold">৳0</span></span>
                         <span>Balance: <span id="acc-balance-noman" class="text-green-600 font-bold">৳0</span></span>
                     </div>
                 </div>
+                <!-- Rayan -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-gray-800">Rayan (60%)</span>
-                        <span class="text-xs bg-purple-100 text-purple-800 px-2 rounded">Share: <span id="acc-share-rayan">৳0</span></span>
+                        <!-- Removed Share Display as requested -->
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         <span>Withdrawn: <span id="acc-withdrawn-rayan" class="text-red-500 font-semibold">৳0</span></span>
@@ -366,8 +368,8 @@
                     <div class="col-span-2"><label class="text-xs text-gray-500">Product Name</label><input type="text" id="prod-name" required class="w-full border rounded p-2"></div>
                     <div><label class="text-xs text-gray-500">Code (Optional)</label><input type="text" id="prod-code" class="w-full border rounded p-2"></div>
                     <div><label class="text-xs text-gray-500">Size/Model</label><input type="text" id="prod-size" class="w-full border rounded p-2"></div>
-                    <div><label class="text-xs text-gray-500">Buy Price</label><input type="number" id="prod-buy" required class="w-full border rounded p-2"></div>
-                    <div><label class="text-xs text-gray-500">Sell Price</label><input type="number" id="prod-sell" required class="w-full border rounded p-2"></div>
+                    <div><label class="text-xs text-gray-500">Buy Price</label><input type="number" id="prod-buy" required class="w-full border rounded p-2" step="0.01"></div>
+                    <div><label class="text-xs text-gray-500">Sell Price</label><input type="number" id="prod-sell" required class="w-full border rounded p-2" step="0.01"></div>
                     <div id="stock-field-container" class="col-span-2"><label class="text-xs text-gray-500">Current Stock</label><input type="number" id="prod-stock" class="w-full border rounded p-2 bg-yellow-50"></div>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-2">SAVE ITEM</button>
@@ -578,7 +580,8 @@
             const search = document.getElementById('inv-search').value.toLowerCase();
             const list = document.getElementById('inv-product-list');
             list.innerHTML = '';
-            const filtered = products.filter(p => p.name.toLowerCase().includes(search) || (p.code && p.code.toLowerCase().includes(search)));
+            // Fixed: Convert name and code to String before lowercase to prevent crash on numbers
+            const filtered = products.filter(p => String(p.name).toLowerCase().includes(search) || (p.code && String(p.code).toLowerCase().includes(search)));
             filtered.forEach(p => {
                 const stockDisplay = p.isService ? '<span class="text-blue-500 font-bold">Service</span>' : `Stock: ${p.stock}`;
                 const stockClass = (!p.isService && p.stock < 5) ? 'text-red-500 font-bold' : 'text-gray-500';
@@ -654,7 +657,8 @@
             const term = document.getElementById('pos-search').value.toLowerCase();
             const container = document.getElementById('pos-search-results');
             container.innerHTML = '';
-            const filtered = products.filter(p => p.name.toLowerCase().includes(term) || (p.code && p.code.toLowerCase().includes(term)));
+            // Fixed: Convert name and code to String before lowercase to prevent crash on numbers
+            const filtered = products.filter(p => String(p.name).toLowerCase().includes(term) || (p.code && String(p.code).toLowerCase().includes(term)));
             filtered.forEach(p => {
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded border border-gray-200 active:bg-blue-50 cursor-pointer flex justify-between';
@@ -917,13 +921,15 @@
             const withdrawnNoman = withdrawals.filter(w => w.partner === 'Noman').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             const withdrawnRayan = withdrawals.filter(w => w.partner === 'Rayan').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             
-            document.getElementById('acc-share-noman').innerText = '৳' + shareNoman.toLocaleString(undefined, {maximumFractionDigits:0});
+            // Share Display Removed
+            // document.getElementById('acc-share-noman').innerText = ...
             document.getElementById('acc-withdrawn-noman').innerText = '৳' + withdrawnNoman.toLocaleString(undefined, {maximumFractionDigits:0});
             const balNoman = shareNoman - withdrawnNoman;
             document.getElementById('acc-balance-noman').innerText = '৳' + balNoman.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('acc-balance-noman').className = balNoman < 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
 
-            document.getElementById('acc-share-rayan').innerText = '৳' + shareRayan.toLocaleString(undefined, {maximumFractionDigits:0});
+            // Share Display Removed
+            // document.getElementById('acc-share-rayan').innerText = ...
             document.getElementById('acc-withdrawn-rayan').innerText = '৳' + withdrawnRayan.toLocaleString(undefined, {maximumFractionDigits:0});
             const balRayan = shareRayan - withdrawnRayan;
             document.getElementById('acc-balance-rayan').innerText = '৳' + balRayan.toLocaleString(undefined, {maximumFractionDigits:0});
