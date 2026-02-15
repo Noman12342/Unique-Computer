@@ -140,7 +140,7 @@
         </section>
 
         <!-- *** POS (SELL) TAB *** -->
-        <section id="tab-pos" class="view-section hidden h-full flex flex-col">
+        <section id="tab-pos" class="view-section hidden min-h-full flex flex-col">
             <div onclick="openProductSelectModal()" class="bg-white p-3 rounded-lg shadow-sm border border-blue-200 flex justify-between items-center mb-3 cursor-pointer active:bg-blue-50 shrink-0">
                 <span class="text-gray-500"><i class="fa-solid fa-magnifying-glass mr-2"></i>Select Product to Sell...</span>
                 <i class="fa-solid fa-chevron-down text-gray-400"></i>
@@ -170,30 +170,33 @@
                 </div>
                 <button onclick="addToCart()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 active:scale-95 transition">ADD TO CART</button>
             </div>
-            <div class="flex-grow bg-white rounded-lg shadow-sm overflow-hidden flex flex-col min-h-[150px]">
-                <div class="bg-gray-50 px-3 py-2 border-b flex justify-between items-center shrink-0">
+            
+            <!-- Cart List -->
+            <div class="flex-grow bg-white rounded-lg shadow-sm flex flex-col p-2 space-y-2 mb-3">
+                <div class="bg-gray-50 px-2 py-1 border-b flex justify-between items-center shrink-0">
                     <span class="font-bold text-sm text-gray-600">Cart Items</span>
                     <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">Clear All</button>
                 </div>
-                <div id="pos-cart-list" class="flex-grow overflow-y-auto p-2 space-y-2">
-                    <div class="text-center text-gray-400 mt-10">Cart is empty</div>
+                <div id="pos-cart-list" class="flex-col space-y-2">
+                    <div class="text-center text-gray-400 mt-4 mb-4">Cart is empty</div>
                 </div>
             </div>
-            <div class="mt-3 bg-white p-3 rounded-t-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0">
+
+            <div class="bg-white p-3 rounded-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0 mb-4 border border-gray-100">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-gray-500">Total Payable:</span>
                     <span id="pos-grand-total" class="text-2xl font-bold text-blue-600">৳0</span>
                 </div>
                 
-                <!-- Added: Partial Payment Input -->
+                <!-- Partial Payment Input -->
                 <div class="flex items-center gap-2 mb-3 bg-blue-50 p-2 rounded border border-blue-100">
                     <div class="flex-1">
                         <label class="text-[10px] text-gray-500 font-bold">Paid Amount</label>
                         <input type="number" id="pos-paid-amount" class="w-full border p-1 rounded font-bold text-green-600" oninput="calculateDue()">
                     </div>
                     <div class="flex-1 text-right">
-                        <label class="text-[10px] text-gray-500 font-bold">Due Amount</label>
-                        <div id="pos-due-display" class="font-bold text-red-500 text-lg">৳0</div>
+                        <label class="text-[10px] text-gray-500 font-bold">Current Due</label>
+                        <div id="pos-due-display" class="font-bold text-green-500 text-lg">৳0</div>
                     </div>
                 </div>
 
@@ -202,11 +205,18 @@
                         <label class="text-[10px] text-gray-500 font-bold ml-1">Sale Date</label>
                         <input type="date" id="pos-date" class="w-full border p-2 rounded text-sm text-gray-700 font-semibold bg-gray-50">
                     </div>
-                    <input type="text" id="pos-cust-name" placeholder="Customer Name (Optional)" class="w-full border p-2 rounded text-sm">
+                    <!-- Customer Input with Auto-check -->
+                    <input type="text" id="pos-cust-name" placeholder="Customer Name (Optional)" class="w-full border p-2 rounded text-sm" oninput="checkCustomerDue()">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="pos-cust-mobile" placeholder="Mobile No." class="w-full border p-2 rounded text-sm">
+                        <input type="text" id="pos-cust-mobile" placeholder="Mobile No." class="w-full border p-2 rounded text-sm" oninput="checkCustomerDue()">
                         <input type="text" id="pos-cust-address" placeholder="Address" class="w-full border p-2 rounded text-sm">
                     </div>
+                    <!-- New: Previous Due Display -->
+                    <div id="pos-prev-due-box" class="hidden bg-red-100 border border-red-200 text-red-700 px-3 py-2 rounded text-sm font-bold flex justify-between">
+                        <span><i class="fa-solid fa-triangle-exclamation mr-1"></i>Previous Due:</span>
+                        <span id="pos-prev-due-amount">৳0</span>
+                    </div>
+
                     <div class="flex gap-2 mt-1">
                         <select id="pos-pay-method" class="border p-2 rounded text-sm flex-1 bg-white">
                             <option value="Cash">Cash</option>
@@ -233,7 +243,6 @@
             <h2 class="text-xl font-bold text-gray-800 mb-4 px-2">Financial Overview</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-blue-500">
-                    <!-- Changed label to Total Sell (Cash) as requested -->
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Total Sell (Cash)</p>
                     <h3 class="text-lg font-bold text-blue-600" id="acc-revenue">৳0</h3>
                 </div>
@@ -242,8 +251,8 @@
                     <h3 class="text-lg font-bold text-red-600" id="acc-total-withdraw">৳0</h3>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-purple-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold">Investment</p>
-                    <h3 class="text-lg font-bold text-purple-600" id="acc-investment">৳0</h3>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cash</p>
+                    <h3 class="text-lg font-bold text-purple-600" id="acc-total-cash">৳0</h3>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-emerald-500">
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Gross Profit</p>
@@ -344,7 +353,6 @@
                     <p class="text-sm mt-1" id="report-period-label">Period: All</p>
                 </div>
                 
-                <!-- Updated Report Stats: 3 Columns -->
                 <div class="grid grid-cols-3 gap-2 mb-6 text-sm">
                     <div class="border p-2 rounded bg-green-50">
                         <span class="block text-gray-500 text-[10px] font-bold uppercase">Total Sell (Cash)</span>
@@ -428,10 +436,19 @@
                 <div class="border-b border-dashed pb-2 mb-2 flex justify-between text-xs"><span id="inv-id">#000000</span><span id="inv-date">01/01/2024</span></div>
                 <div class="border-b border-dashed pb-2 mb-2"><p class="text-xs">Bill To:</p><div id="inv-customer-details" class="text-sm font-semibold text-gray-800 leading-tight"></div></div>
                 <table class="w-full text-xs mb-4"><thead><tr class="text-left border-b"><th class="pb-1">Item (Size)</th><th class="pb-1 text-center">Qty</th><th class="pb-1 text-right">Price</th></tr></thead><tbody id="inv-items"></tbody></table>
-                <div class="flex justify-between font-bold text-sm border-t pt-2"><span>TOTAL</span><span id="inv-total">৳0</span></div>
-                <div class="flex justify-between text-xs mt-1 text-gray-600"><span>Paid: <span id="inv-paid" class="font-bold">৳0</span></span></div>
-                <div class="flex justify-between text-xs mt-1 text-gray-600"><span>Due: <span id="inv-due" class="font-bold text-red-500">৳0</span></span></div>
-                <div class="flex justify-between text-xs mt-2 text-gray-500"><span>Method: <span id="inv-method">Cash</span></span></div>
+                <div class="flex justify-between font-bold text-sm border-t pt-2"><span>Current Bill</span><span id="inv-total">৳0</span></div>
+                
+                <div class="flex justify-between text-xs mt-2 text-gray-600"><span>Paid: <span id="inv-paid" class="font-bold">৳0</span></span></div>
+                <div class="flex justify-between text-xs mt-1 text-gray-600"><span>Current Due: <span id="inv-current-due" class="font-bold text-red-500">৳0</span></span></div>
+                
+                <!-- Separator -->
+                <div class="border-t border-dashed my-2"></div>
+                
+                <!-- Previous and Total Due -->
+                <div class="flex justify-between text-xs text-gray-500" id="inv-prev-due-row"><span>Previous Due: <span id="inv-prev-due" class="font-bold">৳0</span></span></div>
+                <div class="flex justify-between font-bold text-sm mt-1 text-red-600"><span>TOTAL OUTSTANDING</span><span id="inv-total-outstanding">৳0</span></div>
+                
+                <div class="flex justify-between text-xs mt-2 text-gray-500 pt-2 border-t"><span>Method: <span id="inv-method">Cash</span></span></div>
                 <div class="mt-8 pt-4 border-t border-gray-300 flex justify-between text-[10px] text-gray-400"><span>Customer Sig.</span><span>Auth. Signature</span></div>
                 <div class="text-center text-[10px] mt-2 italic">Thank you for your business!</div>
             </div>
@@ -458,7 +475,8 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzYbPaW6Ai-mtwI7Qtp232RhQQBDqXY6uNgzWrBUt9wan2CPpAbA2htGpHk0YCYuBuPOQ/exec";
         
-        let products = [], sales = [], withdrawals = [], cart = [], posSelectedItem = null, lastActiveTab = 'dashboard'; 
+        let products = [], sales = [], withdrawals = [], cart = [], posSelectedItem = null, lastActiveTab = 'dashboard';
+        let currentCustomerPrevDue = 0; // GLOBAL VARIABLE TO STORE PREV DUE
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchAllData(); 
@@ -602,7 +620,6 @@
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded border border-gray-200 active:bg-blue-50 cursor-pointer flex justify-between';
                 item.onclick = () => selectPosItem(p);
-                // UPDATED: Added size display here
                 item.innerHTML = `<div><div class="font-bold">${p.name} <span class="text-xs font-normal text-gray-600">(${p.size || '-'})</span></div><div class="text-xs text-gray-500">${p.code || ''}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${p.sellPrice}</div><div class="text-xs ${(!p.isService && p.stock<=0)?'text-red-500':'text-gray-500'}">${p.isService?'Service':`Stock: ${p.stock}`}</div></div>`;
                 container.appendChild(item);
             });
@@ -628,24 +645,17 @@
             const price = parseFloat(document.getElementById('pos-edit-price').value), qty = parseInt(document.getElementById('pos-edit-qty').value), total = parseFloat(document.getElementById('pos-edit-total-input').value);
             if(!posSelectedItem.isService && qty > posSelectedItem.stock) { alert(`Insufficient Stock! Max available: ${posSelectedItem.stock}`); return; }
             
-            // --- UPDATED LOGIC: CHECK FOR DUPLICATES ---
             const existingItemIndex = cart.findIndex(c => c.id === posSelectedItem.id);
-            
             if (existingItemIndex > -1) {
-                // Item exists, update quantity and total
                 const existingItem = cart[existingItemIndex];
                 const newQty = existingItem.qty + qty;
-                
-                // Stock Check for cumulative qty
                 if (!existingItem.isService && newQty > existingItem.stock) {
                     alert(`Insufficient Stock! You already have ${existingItem.qty} in cart. Max available: ${existingItem.stock}`);
                     return;
                 }
-                
                 cart[existingItemIndex].qty = newQty;
-                cart[existingItemIndex].total += total; // Adding new total to existing total
+                cart[existingItemIndex].total += total;
             } else {
-                // New item
                 cart.push({ ...posSelectedItem, sellPrice: price, qty, total });
             }
             
@@ -660,7 +670,6 @@
                 grandTotal += item.total;
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100';
-                // UPDATED: Added size display here
                 div.innerHTML = `<div class="text-sm"><div class="font-bold">${item.name} <span class="text-xs font-normal text-gray-500">(${item.size || '-'})</span></div><div class="text-xs text-gray-500">${item.qty} x ${Number(item.sellPrice).toFixed(2)}</div></div><div class="flex items-center gap-3"><span class="font-bold text-gray-700">৳${item.total}</span><button onclick="removeFromCart(${idx})" class="text-red-500"><i class="fa-solid fa-times"></i></button></div>`;
                 list.appendChild(div);
             });
@@ -669,7 +678,7 @@
             const gTotal = Math.round(grandTotal);
             document.getElementById('pos-grand-total').innerText = '৳' + gTotal;
             
-            // Reset Partial Payment inputs
+            // UPDATED: Only pre-fill paid amount with current Cart Total
             document.getElementById('pos-paid-amount').value = gTotal;
             calculateDue();
         }
@@ -677,14 +686,61 @@
         function calculateDue() {
             const total = parseInt(document.getElementById('pos-grand-total').innerText.replace('৳', '')) || 0;
             const paid = parseInt(document.getElementById('pos-paid-amount').value) || 0;
+            
+            // UPDATED: Due = Current Bill - Paid Amount (Purely for current transaction)
             const due = total - paid;
-            document.getElementById('pos-due-display').innerText = '৳' + (due > 0 ? due : 0);
-            document.getElementById('pos-due-display').className = due > 0 ? 'font-bold text-red-500 text-lg' : 'font-bold text-green-500 text-lg';
+            
+            if (due > 0) {
+                document.getElementById('pos-due-display').innerText = '৳' + due;
+                document.getElementById('pos-due-display').className = 'font-bold text-red-500 text-lg';
+            } else if (due < 0) {
+                document.getElementById('pos-due-display').innerText = 'Change: ৳' + Math.abs(due);
+                document.getElementById('pos-due-display').className = 'font-bold text-green-600 text-lg';
+            } else {
+                document.getElementById('pos-due-display').innerText = '৳0';
+                document.getElementById('pos-due-display').className = 'font-bold text-green-500 text-lg';
+            }
         }
 
         function removeFromCart(idx) { cart.splice(idx, 1); renderCart(); }
         function clearCart() { cart = []; renderCart(); }
         
+        // --- NEW FUNCTION: Check Previous Customer Due ---
+        function checkCustomerDue() {
+            const name = document.getElementById('pos-cust-name').value.trim().toLowerCase();
+            const mobile = document.getElementById('pos-cust-mobile').value.trim();
+            const box = document.getElementById('pos-prev-due-box');
+            const amountSpan = document.getElementById('pos-prev-due-amount');
+            
+            currentCustomerPrevDue = 0; // Reset global prev due
+
+            if (!name && !mobile) { box.classList.add('hidden'); return; }
+
+            let prevDue = 0;
+            sales.forEach(s => {
+                let sPaid = s.paidAmount !== undefined ? parseFloat(s.paidAmount) : (s.status === 'Paid' ? parseFloat(s.total) : 0);
+                let sDue = parseFloat(s.total) - sPaid;
+                
+                if (sDue > 0) {
+                    let match = false;
+                    if (mobile && s.customerMobile && s.customerMobile.includes(mobile)) match = true;
+                    else if (!mobile && name && s.customer.toLowerCase().includes(name)) match = true;
+                    
+                    if (match) prevDue += sDue;
+                }
+            });
+
+            currentCustomerPrevDue = prevDue; // Store global
+
+            if (prevDue > 0) {
+                amountSpan.innerText = '৳' + prevDue;
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+            // Removed the line that auto-updates paid amount
+        }
+
         async function completeSale() {
             if(cart.length === 0) { showToast('Cart is empty!'); return; }
             if(!confirm("Are you sure?")) return;
@@ -694,22 +750,21 @@
             const payMethod = document.getElementById('pos-pay-method').value;
             const dateInput = document.getElementById('pos-date').value;
             
-            // Partial Payment Logic
             const paidAmount = parseInt(document.getElementById('pos-paid-amount').value) || 0;
+            
+            // UPDATED: Status checks ONLY against current total
             const status = paidAmount >= total ? 'Paid' : 'Due';
 
             let finalDateObj = new Date();
             if(dateInput) { const now = new Date(); finalDateObj = new Date(dateInput + 'T' + now.toTimeString().split(' ')[0]); }
             
-            // We store the paidAmount in the sale object. Note: Backend might need update to save this column, 
-            // but we can infer it for local display or update later.
             const sale = { 
                 id: generateId(), 
                 date: finalDateObj.toISOString(), 
                 paidAt: status === 'Paid' ? finalDateObj.toISOString() : null, 
                 items: cart, 
                 total, 
-                paidAmount: paidAmount, // Sending this even if backend script ignores it currently
+                paidAmount: paidAmount, 
                 customer: custName, 
                 customerMobile: document.getElementById('pos-cust-mobile').value, 
                 customerAddress: document.getElementById('pos-cust-address').value, 
@@ -722,7 +777,8 @@
             await postData('addSale', sale);
             if(stockUpdates.length > 0) await postData('updateStockBatch', stockUpdates);
             
-            cart = []; document.getElementById('pos-cust-name').value = ''; 
+            cart = []; document.getElementById('pos-cust-name').value = ''; document.getElementById('pos-cust-mobile').value = ''; document.getElementById('pos-cust-address').value = ''; document.getElementById('pos-prev-due-box').classList.add('hidden');
+            currentCustomerPrevDue = 0; // Reset
             const today = new Date(); document.getElementById('pos-date').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             renderCart(); showInvoice(sale.id);
         }
@@ -735,18 +791,13 @@
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             document.getElementById('history-month-label').innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
-            // Combine Sales and Withdrawals for the history list
             let mixedHistory = [];
-
-            // 1. Add Sales
             sales.forEach(s => {
                 const effDate = (s.status === 'Paid' && s.paidAt) ? new Date(s.paidAt) : new Date(s.date);
                 if (effDate.getMonth() === currentMonth && effDate.getFullYear() === currentYear) {
                     mixedHistory.push({ type: 'sale', data: s, date: effDate });
                 }
             });
-
-            // 2. Add Withdrawals
             withdrawals.forEach(w => {
                 const wDate = new Date(w.date);
                 if (wDate.getMonth() === currentMonth && wDate.getFullYear() === currentYear) {
@@ -754,7 +805,6 @@
                 }
             });
 
-            // Sort by Date Descending
             mixedHistory.sort((a,b) => b.date - a.date);
 
             if(mixedHistory.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 py-4">No activity this month</p>'; return; }
@@ -784,25 +834,53 @@
             document.getElementById('inv-date').innerText = formatDate(sale.date);
             let custHTML = `<div>${sale.customer}</div>`; if(sale.customerMobile) custHTML += `<div class="text-xs text-gray-500">Mob: ${sale.customerMobile}</div>`;
             document.getElementById('inv-customer-details').innerHTML = custHTML;
+            
+            // 1. Calculate Previous Due (Before current transaction)
+            let prevDue = 0;
+            sales.forEach(s => {
+                if (s.id != sale.id) { // Exclude current invoice
+                    let sPaid = s.paidAmount !== undefined ? parseFloat(s.paidAmount) : (s.status === 'Paid' ? parseFloat(s.total) : 0);
+                    let sDue = parseFloat(s.total) - sPaid;
+                    if (sDue > 0) {
+                        let match = false;
+                        if (sale.customerMobile && s.customerMobile && s.customerMobile === sale.customerMobile) match = true;
+                        else if (!sale.customerMobile && s.customer && sale.customer && s.customer.trim().toLowerCase() === sale.customer.trim().toLowerCase()) match = true;
+                        if (match) prevDue += sDue;
+                    }
+                }
+            });
+
+            // 2. Display Items
+            const tbody = document.getElementById('inv-items'); tbody.innerHTML = '';
+            sale.items.forEach(i => { tbody.innerHTML += `<tr><td class="pb-1">${i.name} <span class="text-[10px] text-gray-500">(${i.size || '-'})</span></td><td class="pb-1 text-center">${i.qty}</td><td class="pb-1 text-right">${i.total}</td></tr>`; });
+            
+            // 3. Current Bill & Net Payable Logic
             document.getElementById('inv-total').innerText = '৳' + sale.total; 
             
-            // Determine Paid and Due for Display
-            // If paidAmount exists in object use it, otherwise fallback to logic based on status
+            // UPDATED: Invoice Logic to separate current and previous due visually
             let paidAmount = 0;
             if (sale.paidAmount !== undefined) {
-                paidAmount = sale.paidAmount;
+                paidAmount = parseFloat(sale.paidAmount);
             } else {
-                paidAmount = sale.status === 'Paid' ? sale.total : 0;
+                paidAmount = sale.status === 'Paid' ? parseFloat(sale.total) : 0;
             }
-            const dueAmount = sale.total - paidAmount;
-
+            
+            const currentDue = sale.total - paidAmount;
+            
             document.getElementById('inv-paid').innerText = '৳' + paidAmount;
-            document.getElementById('inv-due').innerText = '৳' + (dueAmount > 0 ? dueAmount : 0);
+            document.getElementById('inv-current-due').innerText = '৳' + (currentDue > 0 ? currentDue : 0);
+
+            if (prevDue > 0) {
+                document.getElementById('inv-prev-due-row').classList.remove('hidden');
+                document.getElementById('inv-prev-due').innerText = '৳' + prevDue;
+                // Total Outstanding = Current Invoice Due + Previous Due
+                document.getElementById('inv-total-outstanding').innerText = '৳' + (currentDue + prevDue);
+            } else {
+                document.getElementById('inv-prev-due-row').classList.add('hidden');
+                document.getElementById('inv-total-outstanding').innerText = '৳' + currentDue;
+            }
             
             document.getElementById('inv-method').innerText = sale.paymentMethod;
-            const tbody = document.getElementById('inv-items'); tbody.innerHTML = '';
-            // UPDATED: Added size display here
-            sale.items.forEach(i => { tbody.innerHTML += `<tr><td class="pb-1">${i.name} <span class="text-[10px] text-gray-500">(${i.size || '-'})</span></td><td class="pb-1 text-center">${i.qty}</td><td class="pb-1 text-right">${i.total}</td></tr>`; });
             
             if(sale.status === 'Due') document.getElementById('btn-pay-due').classList.remove('hidden'); else document.getElementById('btn-pay-due').classList.add('hidden');
             document.getElementById('modal-invoice').classList.add('active');
@@ -810,7 +888,7 @@
         function printInvoice() { document.body.classList.add('printing-invoice'); window.print(); setTimeout(() => document.body.classList.remove('printing-invoice'), 500); }
         async function payDue() { if(!currentInvoiceId)return; if(!confirm("Mark as PAID?"))return; await postDataWithId('updateSaleStatus', currentInvoiceId, { paidAt: new Date().toISOString() }); closeModal('modal-invoice'); }
 
-        // --- Dashboard & Accounts ---
+        // --- Dashboard & Accounts (Same as before) ---
         function renderDashboard() {
             const today = new Date().toDateString();
             const totalToday = sales.reduce((acc, s) => {
@@ -826,7 +904,6 @@
             document.getElementById('dash-total-due').innerText = '৳' + Math.round(totalDue).toLocaleString();
             document.getElementById('dash-low-stock-count').innerText = products.filter(p => !p.isService && p.stock < 5).length;
             renderTopSelling();
-            // Recent List
             const recentList = document.getElementById('dash-recent-list'); recentList.innerHTML = '';
             [...sales].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5).forEach(s => {
                 recentList.innerHTML += `<div class="flex justify-between text-sm border-b pb-2 last:border-0"><div><span class="font-bold text-gray-700">#${s.id}</span><span class="text-gray-500 text-xs ml-1">${s.customer}</span></div><div class="font-bold text-gray-600">৳${s.total}</div></div>`;
@@ -868,46 +945,52 @@
         }
 
         function updateAccountStats() {
-            const investment = products.reduce((acc, p) => acc + ((p.isService ? 0 : p.stock) * p.buyPrice), 0);
-            document.getElementById('acc-investment').innerText = '৳' + investment.toLocaleString();
+            // 1. Calculate Total Cash Received from Sales (grossRevenue)
+            const grossRevenue = sales.reduce((acc, s) => {
+                let received = 0;
+                if (s.paidAmount !== undefined) {
+                    received = parseFloat(s.paidAmount) || 0;
+                } else {
+                    // Fallback for older data
+                    received = (s.status === 'Paid') ? (parseFloat(s.total) || 0) : 0;
+                }
+                return acc + received;
+            }, 0);
+
+            // 2. Calculate Total Withdrawals
+            const totalWithdrawals = withdrawals.reduce((acc, w) => acc + (parseFloat(w.amount)||0), 0);
             
-            // Gross Revenue (Only Paid Sales)
-            const grossRevenue = sales.reduce((acc, s) => (s.status === 'Paid') ? acc + (parseInt(s.total)||0) : acc, 0);
+            // 3. Calculate Total Cash (Net)
+            const totalCash = grossRevenue - totalWithdrawals;
+
+            // Update DOM
+            const totalCashEl = document.getElementById('acc-total-cash');
+            if(totalCashEl) totalCashEl.innerText = '৳' + totalCash.toLocaleString();
             
-            // Total Withdrawals
-            const totalWithdrawals = withdrawals.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             document.getElementById('acc-total-withdraw').innerText = '৳' + totalWithdrawals.toLocaleString();
+            document.getElementById('acc-revenue').innerText = '৳' + grossRevenue.toLocaleString();
 
-            // Total Sell (Cash) displayed in Accounts Tab
-            const totalSellCash = grossRevenue; 
-            document.getElementById('acc-revenue').innerText = '৳' + totalSellCash.toLocaleString();
-
-            // Gross Profit
+            // Removed investment calculation as requested
+            
             let totalCost = 0;
             sales.forEach(sale => {
                 if(sale.status === 'Paid') {
                     sale.items.forEach(item => { const original = products.find(p => p.id == item.id); if(original) totalCost += (original.buyPrice * item.qty); });
                 }
             });
-            // Note: Profit is usually on Sales, not net cash flow, but simplified here.
             const grossProfit = grossRevenue - totalCost;
             document.getElementById('acc-gross-profit').innerText = '৳' + grossProfit.toLocaleString();
-            
             const totalDue = sales.filter(s => s.status === 'Due').reduce((acc, s) => acc + (parseInt(s.total)||0), 0);
             document.getElementById('acc-dues').innerText = '৳' + totalDue.toLocaleString();
             
-            // Partnership
-            const shareNoman = grossRevenue * 0.40; // Share based on Gross Revenue (Fairness)
+            const shareNoman = grossRevenue * 0.40; 
             const shareRayan = grossRevenue * 0.60;
-            // Fixed variable name wdNoman and wdRayan here
             const wdNoman = withdrawals.filter(w => w.partner === 'Noman').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             const wdRayan = withdrawals.filter(w => w.partner === 'Rayan').reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
-            
             document.getElementById('acc-withdrawn-noman').innerText = '৳' + wdNoman.toLocaleString();
             const balNoman = shareNoman - wdNoman;
             document.getElementById('acc-balance-noman').innerText = '৳' + balNoman.toLocaleString(undefined, {maximumFractionDigits:0});
             document.getElementById('acc-balance-noman').className = balNoman < 0 ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
-
             document.getElementById('acc-withdrawn-rayan').innerText = '৳' + wdRayan.toLocaleString();
             const balRayan = shareRayan - wdRayan;
             document.getElementById('acc-balance-rayan').innerText = '৳' + balRayan.toLocaleString(undefined, {maximumFractionDigits:0});
@@ -927,14 +1010,11 @@
 
         function renderAllSalesHistory() {
             const list = document.getElementById('acc-all-sales-list'); list.innerHTML = '';
-            
             let mixedHistory = [];
             sales.forEach(s => mixedHistory.push({ type: 'sale', data: s, date: new Date(s.date) }));
             withdrawals.forEach(w => mixedHistory.push({ type: 'withdraw', data: w, date: new Date(w.date) }));
             mixedHistory.sort((a,b) => b.date - a.date);
-
             if(mixedHistory.length === 0) { list.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Data</td></tr>'; return; }
-            
             mixedHistory.forEach(item => {
                 const tr = document.createElement('tr');
                 if (item.type === 'sale') {
@@ -958,65 +1038,35 @@
             const isMonthMatch = (d) => month === 'all' ? true : d.getMonth() === parseInt(month);
             
             let filteredSales = sales.filter(s => { const d = new Date(s.date); return isYearMatch(d) && isMonthMatch(d); });
-            
-            let totalPaid = 0;
-            let totalDue = 0;
-            let totalGrand = 0;
-
+            let totalPaid = 0; let totalDue = 0; let totalGrand = 0;
             let filteredWd = withdrawals.filter(w => { const d = new Date(w.date); return isYearMatch(d) && isMonthMatch(d); });
             let totalWd = filteredWd.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
 
-            // Period Label Logic
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             let periodText = (yearVal === 'all' && month === 'all') ? "All Time History" : (yearVal === 'all' ? `Month: ${monthNames[month]}` : (month === 'all' ? `Year: ${yearVal}` : `${monthNames[month]} ${yearVal}`));
             document.getElementById('report-period-label').innerText = `Period: ${periodText}`;
 
-            // Render Sales Table
             salesBody.innerHTML = '';
             filteredSales.forEach(s => {
-                // Determine paid vs due for report stats
                 let paid = 0;
-                if (s.paidAmount !== undefined) {
-                    paid = parseFloat(s.paidAmount) || 0;
-                } else {
-                    paid = s.status === 'Paid' ? (parseFloat(s.total) || 0) : 0;
-                }
+                if (s.paidAmount !== undefined) { paid = parseFloat(s.paidAmount) || 0; } else { paid = s.status === 'Paid' ? (parseFloat(s.total) || 0) : 0; }
                 let total = parseFloat(s.total) || 0;
-                let due = total - paid;
-                if(due < 0) due = 0;
-
-                totalPaid += paid;
-                totalDue += due;
-                totalGrand += total;
-
+                let due = total - paid; if(due < 0) due = 0;
+                totalPaid += paid; totalDue += due; totalGrand += total;
                 const statusBadge = s.status === 'Due' ? '<span class="text-red-500 font-bold">Due</span>' : '<span class="text-green-600">Paid</span>';
                 salesBody.innerHTML += `<tr class="border-b"><td class="py-1 px-2">#${s.id}</td><td class="py-1 px-2">${formatSimpleDate(s.date)}</td><td class="py-1 px-2">${s.customer}<div class="text-[10px] text-gray-400">${s.paymentMethod}</div></td><td class="py-1 px-2 text-right"><div>৳${s.total}</div><div class="text-[10px]">${statusBadge}</div></td></tr>`;
             });
             
-            if(filteredSales.length === 0) {
-                salesBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Created</td></tr>';
-            } else {
-                // Append Grand Total Row
-                salesBody.innerHTML += `
-                    <tr class="bg-gray-200 font-bold border-t border-black">
-                        <td colspan="3" class="py-1 px-2 text-right">Grand Total:</td>
-                        <td class="py-1 px-2 text-right">৳${totalGrand.toLocaleString()}</td>
-                    </tr>
-                `;
-            }
+            if(filteredSales.length === 0) { salesBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Created</td></tr>'; } 
+            else { salesBody.innerHTML += `<tr class="bg-gray-200 font-bold border-t border-black"><td colspan="3" class="py-1 px-2 text-right">Grand Total:</td><td class="py-1 px-2 text-right">৳${totalGrand.toLocaleString()}</td></tr>`; }
 
-            // Render Withdraw Table
             wdBody.innerHTML = '';
-            filteredWd.forEach(w => {
-                wdBody.innerHTML += `<tr class="border-b"><td class="p-2">${formatSimpleDate(w.date)}</td><td class="p-2 font-semibold">${w.partner}</td><td class="p-2 text-right">৳${w.amount}</td></tr>`;
-            });
+            filteredWd.forEach(w => { wdBody.innerHTML += `<tr class="border-b"><td class="p-2">${formatSimpleDate(w.date)}</td><td class="p-2 font-semibold">${w.partner}</td><td class="p-2 text-right">৳${w.amount}</td></tr>`; });
             if(filteredWd.length === 0) wdBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400">No Withdrawals Found</td></tr>';
             
-            // Update Report Stats Grid
             document.getElementById('rpt-total-sales').innerText = '৳' + totalPaid.toLocaleString();
             document.getElementById('rpt-total-due').innerText = '৳' + totalDue.toLocaleString();
             document.getElementById('rpt-total-withdraw').innerText = '৳' + totalWd.toLocaleString();
-            
             area.classList.remove('hidden');
         }
         function printReport() { document.body.classList.add('printing-report'); window.print(); setTimeout(() => document.body.classList.remove('printing-report'), 500); }
