@@ -24,7 +24,7 @@
         /* Loader Overlay */
         #loader-overlay {
             position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 100;
-            display: flex; flex-col: column; justify-content: center; align-items: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.3s;
         }
         .spinner {
@@ -33,22 +33,27 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* PRINT STYLES HANDLING BOTH RECEIPT (A5/Thermal) AND REPORT (A4) */
+        /* PRINT STYLES HANDLING BOTH RECEIPT (A6/Thermal) AND REPORT (A4) */
         @media print {
-            body, html { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; background: white !important; }
-            @page { size: auto; margin: 0mm; }
+            body, html { margin: 0 !important; padding: 0 !important; height: auto !important; overflow: hidden !important; background: white !important; }
             header, nav, .fab-btn, .no-print, #loader-overlay { display: none !important; }
-
-            /* SCENARIO 1: INVOICE PRINTING (A5) */
+            
+            /* SCENARIO 1: INVOICE PRINTING (A6) */
             body.printing-invoice * { visibility: hidden; }
             body.printing-invoice #modal-invoice {
                 visibility: visible !important; position: absolute !important; left: 0 !important; top: 0 !important;
-                width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important;
+                width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important; display: block !important;
+                background: white !important;
             }
             body.printing-invoice #invoice-print-area, body.printing-invoice #invoice-print-area * { visibility: visible !important; }
             body.printing-invoice #invoice-print-area {
-                width: 148mm !important; min-height: 210mm; padding: 5mm !important; margin: 0 auto; background: white;
+                width: 100mm !important; /* A6 Width approx */
+                padding: 5mm !important; 
+                margin: 0 auto; 
+                background: white;
+                font-size: 12px;
             }
+            @page { size: A6; margin: 0mm; }
 
             /* SCENARIO 2: A4 REPORT PRINTING */
             body.printing-report * { visibility: hidden; }
@@ -175,10 +180,23 @@
                 </div>
             </div>
             <div class="mt-3 bg-white p-3 rounded-t-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] shrink-0">
-                <div class="flex justify-between items-center mb-3">
+                <div class="flex justify-between items-center mb-2">
                     <span class="text-gray-500">Total Payable:</span>
                     <span id="pos-grand-total" class="text-2xl font-bold text-blue-600">৳0</span>
                 </div>
+                
+                <!-- Added: Partial Payment Input -->
+                <div class="flex items-center gap-2 mb-3 bg-blue-50 p-2 rounded border border-blue-100">
+                    <div class="flex-1">
+                        <label class="text-[10px] text-gray-500 font-bold">Paid Amount</label>
+                        <input type="number" id="pos-paid-amount" class="w-full border p-1 rounded font-bold text-green-600" oninput="calculateDue()">
+                    </div>
+                    <div class="flex-1 text-right">
+                        <label class="text-[10px] text-gray-500 font-bold">Due Amount</label>
+                        <div id="pos-due-display" class="font-bold text-red-500 text-lg">৳0</div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 gap-2 mb-3">
                     <div>
                         <label class="text-[10px] text-gray-500 font-bold ml-1">Sale Date</label>
@@ -193,7 +211,7 @@
                         <select id="pos-pay-method" class="border p-2 rounded text-sm flex-1 bg-white">
                             <option value="Cash">Cash</option>
                             <option value="Bkash">Bkash</option>
-                            <option value="Due">Due (Baki)</option>
+                            <option value="Card">Card</option>
                         </select>
                         <button onclick="completeSale()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg active:scale-95 transition w-1/2">SELL <i class="fa-solid fa-check ml-1"></i></button>
                     </div>
@@ -215,10 +233,10 @@
             <h2 class="text-xl font-bold text-gray-800 mb-4 px-2">Financial Overview</h2>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-blue-500">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Revenue (Net)</p>
+                    <!-- Changed label to Total Sell (Cash) as requested -->
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Sell (Cash)</p>
                     <h3 class="text-lg font-bold text-blue-600" id="acc-revenue">৳0</h3>
                 </div>
-                <!-- ADDED: Missing Total Withdraw Card -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-red-500">
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Total Withdrawn</p>
                     <h3 class="text-lg font-bold text-red-600" id="acc-total-withdraw">৳0</h3>
@@ -325,16 +343,23 @@
                     <h3 class="text-lg font-semibold mt-2 bg-gray-100 inline-block px-4 py-1 rounded">Business Report</h3>
                     <p class="text-sm mt-1" id="report-period-label">Period: All</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-                    <div class="border p-2 rounded">
-                        <span class="block text-gray-500">Net Revenue (Sales - WD)</span>
-                        <span class="block text-lg font-bold text-blue-600" id="rpt-total-sales">৳0</span>
+                
+                <!-- Updated Report Stats: 3 Columns -->
+                <div class="grid grid-cols-3 gap-2 mb-6 text-sm">
+                    <div class="border p-2 rounded bg-green-50">
+                        <span class="block text-gray-500 text-[10px] font-bold uppercase">Total Sell (Cash)</span>
+                        <span class="block text-lg font-bold text-green-600" id="rpt-total-sales">৳0</span>
                     </div>
-                    <div class="border p-2 rounded">
-                        <span class="block text-gray-500">Total Withdrawals</span>
+                    <div class="border p-2 rounded bg-orange-50">
+                        <span class="block text-gray-500 text-[10px] font-bold uppercase">Total Due</span>
+                        <span class="block text-lg font-bold text-orange-600" id="rpt-total-due">৳0</span>
+                    </div>
+                    <div class="border p-2 rounded bg-red-50">
+                        <span class="block text-gray-500 text-[10px] font-bold uppercase">Total Withdrawal</span>
                         <span class="block text-lg font-bold text-red-600" id="rpt-total-withdraw">৳0</span>
                     </div>
                 </div>
+
                 <h4 class="font-bold text-sm mb-2 border-b">Withdrawal History</h4>
                 <table class="w-full text-xs text-left mb-6">
                     <thead><tr class="bg-gray-50"><th class="p-2">Date</th><th class="p-2">Partner</th><th class="p-2 text-right">Amount</th></tr></thead>
@@ -342,7 +367,7 @@
                 </table>
                 <h4 class="font-bold text-sm mb-2 border-b">Sales History</h4>
                 <table class="w-full text-xs text-left mb-8">
-                    <thead><tr class="bg-gray-50"><th class="p-2">Inv ID</th><th class="p-2">Date</th><th class="p-2">Customer</th><th class="p-2 text-right">Amount</th></tr></thead>
+                    <thead><tr class="bg-gray-50"><th class="py-1 px-2">Inv ID</th><th class="py-1 px-2">Date</th><th class="py-1 px-2">Customer</th><th class="py-1 px-2 text-right">Amount</th></tr></thead>
                     <tbody id="rpt-sales-table"></tbody>
                 </table>
                 <div class="flex justify-between mt-16 pt-8 text-sm font-bold text-gray-600">
@@ -404,7 +429,9 @@
                 <div class="border-b border-dashed pb-2 mb-2"><p class="text-xs">Bill To:</p><div id="inv-customer-details" class="text-sm font-semibold text-gray-800 leading-tight"></div></div>
                 <table class="w-full text-xs mb-4"><thead><tr class="text-left border-b"><th class="pb-1">Item (Size)</th><th class="pb-1 text-center">Qty</th><th class="pb-1 text-right">Price</th></tr></thead><tbody id="inv-items"></tbody></table>
                 <div class="flex justify-between font-bold text-sm border-t pt-2"><span>TOTAL</span><span id="inv-total">৳0</span></div>
-                <div class="flex justify-between text-xs mt-1 text-gray-500"><span>Payment: <span id="inv-method">Cash</span></span></div>
+                <div class="flex justify-between text-xs mt-1 text-gray-600"><span>Paid: <span id="inv-paid" class="font-bold">৳0</span></span></div>
+                <div class="flex justify-between text-xs mt-1 text-gray-600"><span>Due: <span id="inv-due" class="font-bold text-red-500">৳0</span></span></div>
+                <div class="flex justify-between text-xs mt-2 text-gray-500"><span>Method: <span id="inv-method">Cash</span></span></div>
                 <div class="mt-8 pt-4 border-t border-gray-300 flex justify-between text-[10px] text-gray-400"><span>Customer Sig.</span><span>Auth. Signature</span></div>
                 <div class="text-center text-[10px] mt-2 italic">Thank you for your business!</div>
             </div>
@@ -575,7 +602,8 @@
                 const item = document.createElement('div');
                 item.className = 'bg-white p-3 rounded border border-gray-200 active:bg-blue-50 cursor-pointer flex justify-between';
                 item.onclick = () => selectPosItem(p);
-                item.innerHTML = `<div><div class="font-bold">${p.name}</div><div class="text-xs text-gray-500">${p.code || ''}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${p.sellPrice}</div><div class="text-xs ${(!p.isService && p.stock<=0)?'text-red-500':'text-gray-500'}">${p.isService?'Service':`Stock: ${p.stock}`}</div></div>`;
+                // UPDATED: Added size display here
+                item.innerHTML = `<div><div class="font-bold">${p.name} <span class="text-xs font-normal text-gray-600">(${p.size || '-'})</span></div><div class="text-xs text-gray-500">${p.code || ''}</div></div><div class="text-right"><div class="font-bold text-blue-600">৳${p.sellPrice}</div><div class="text-xs ${(!p.isService && p.stock<=0)?'text-red-500':'text-gray-500'}">${p.isService?'Service':`Stock: ${p.stock}`}</div></div>`;
                 container.appendChild(item);
             });
         }
@@ -599,35 +627,101 @@
             if(!posSelectedItem) return;
             const price = parseFloat(document.getElementById('pos-edit-price').value), qty = parseInt(document.getElementById('pos-edit-qty').value), total = parseFloat(document.getElementById('pos-edit-total-input').value);
             if(!posSelectedItem.isService && qty > posSelectedItem.stock) { alert(`Insufficient Stock! Max available: ${posSelectedItem.stock}`); return; }
-            cart.push({ ...posSelectedItem, sellPrice: price, qty, total });
-            document.getElementById('pos-editor').classList.add('hidden'); posSelectedItem = null; renderCart();
+            
+            // --- UPDATED LOGIC: CHECK FOR DUPLICATES ---
+            const existingItemIndex = cart.findIndex(c => c.id === posSelectedItem.id);
+            
+            if (existingItemIndex > -1) {
+                // Item exists, update quantity and total
+                const existingItem = cart[existingItemIndex];
+                const newQty = existingItem.qty + qty;
+                
+                // Stock Check for cumulative qty
+                if (!existingItem.isService && newQty > existingItem.stock) {
+                    alert(`Insufficient Stock! You already have ${existingItem.qty} in cart. Max available: ${existingItem.stock}`);
+                    return;
+                }
+                
+                cart[existingItemIndex].qty = newQty;
+                cart[existingItemIndex].total += total; // Adding new total to existing total
+            } else {
+                // New item
+                cart.push({ ...posSelectedItem, sellPrice: price, qty, total });
+            }
+            
+            document.getElementById('pos-editor').classList.add('hidden'); 
+            posSelectedItem = null; 
+            renderCart();
         }
+
         function renderCart() {
             const list = document.getElementById('pos-cart-list'); list.innerHTML = ''; let grandTotal = 0;
             cart.forEach((item, idx) => {
                 grandTotal += item.total;
                 const div = document.createElement('div');
                 div.className = 'flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100';
-                div.innerHTML = `<div class="text-sm"><div class="font-bold">${item.name}</div><div class="text-xs text-gray-500">${item.qty} x ${Number(item.sellPrice).toFixed(2)}</div></div><div class="flex items-center gap-3"><span class="font-bold text-gray-700">৳${item.total}</span><button onclick="removeFromCart(${idx})" class="text-red-500"><i class="fa-solid fa-times"></i></button></div>`;
+                // UPDATED: Added size display here
+                div.innerHTML = `<div class="text-sm"><div class="font-bold">${item.name} <span class="text-xs font-normal text-gray-500">(${item.size || '-'})</span></div><div class="text-xs text-gray-500">${item.qty} x ${Number(item.sellPrice).toFixed(2)}</div></div><div class="flex items-center gap-3"><span class="font-bold text-gray-700">৳${item.total}</span><button onclick="removeFromCart(${idx})" class="text-red-500"><i class="fa-solid fa-times"></i></button></div>`;
                 list.appendChild(div);
             });
             if(cart.length === 0) list.innerHTML = '<div class="text-center text-gray-400 mt-10">Cart is empty</div>';
-            document.getElementById('pos-grand-total').innerText = '৳' + grandTotal;
+            
+            const gTotal = Math.round(grandTotal);
+            document.getElementById('pos-grand-total').innerText = '৳' + gTotal;
+            
+            // Reset Partial Payment inputs
+            document.getElementById('pos-paid-amount').value = gTotal;
+            calculateDue();
         }
+        
+        function calculateDue() {
+            const total = parseInt(document.getElementById('pos-grand-total').innerText.replace('৳', '')) || 0;
+            const paid = parseInt(document.getElementById('pos-paid-amount').value) || 0;
+            const due = total - paid;
+            document.getElementById('pos-due-display').innerText = '৳' + (due > 0 ? due : 0);
+            document.getElementById('pos-due-display').className = due > 0 ? 'font-bold text-red-500 text-lg' : 'font-bold text-green-500 text-lg';
+        }
+
         function removeFromCart(idx) { cart.splice(idx, 1); renderCart(); }
         function clearCart() { cart = []; renderCart(); }
+        
         async function completeSale() {
             if(cart.length === 0) { showToast('Cart is empty!'); return; }
             if(!confirm("Are you sure?")) return;
-            const total = cart.reduce((acc, item) => acc + item.total, 0), custName = document.getElementById('pos-cust-name').value || 'Walk-in Customer';
-            const payMethod = document.getElementById('pos-pay-method').value, dateInput = document.getElementById('pos-date').value;
+            
+            const total = cart.reduce((acc, item) => acc + item.total, 0);
+            const custName = document.getElementById('pos-cust-name').value || 'Walk-in Customer';
+            const payMethod = document.getElementById('pos-pay-method').value;
+            const dateInput = document.getElementById('pos-date').value;
+            
+            // Partial Payment Logic
+            const paidAmount = parseInt(document.getElementById('pos-paid-amount').value) || 0;
+            const status = paidAmount >= total ? 'Paid' : 'Due';
+
             let finalDateObj = new Date();
             if(dateInput) { const now = new Date(); finalDateObj = new Date(dateInput + 'T' + now.toTimeString().split(' ')[0]); }
-            const isPaid = payMethod !== 'Due';
-            const sale = { id: generateId(), date: finalDateObj.toISOString(), paidAt: isPaid ? finalDateObj.toISOString() : null, items: cart, total, customer: custName, customerMobile: document.getElementById('pos-cust-mobile').value, customerAddress: document.getElementById('pos-cust-address').value, paymentMethod: payMethod, status: isPaid ? 'Paid' : 'Due' };
+            
+            // We store the paidAmount in the sale object. Note: Backend might need update to save this column, 
+            // but we can infer it for local display or update later.
+            const sale = { 
+                id: generateId(), 
+                date: finalDateObj.toISOString(), 
+                paidAt: status === 'Paid' ? finalDateObj.toISOString() : null, 
+                items: cart, 
+                total, 
+                paidAmount: paidAmount, // Sending this even if backend script ignores it currently
+                customer: custName, 
+                customerMobile: document.getElementById('pos-cust-mobile').value, 
+                customerAddress: document.getElementById('pos-cust-address').value, 
+                paymentMethod: payMethod, 
+                status: status 
+            };
+            
             const stockUpdates = cart.filter(c => !c.isService).map(c => ({ id: c.id, qty: c.qty }));
+            
             await postData('addSale', sale);
             if(stockUpdates.length > 0) await postData('updateStockBatch', stockUpdates);
+            
             cart = []; document.getElementById('pos-cust-name').value = ''; 
             const today = new Date(); document.getElementById('pos-date').value = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             renderCart(); showInvoice(sale.id);
@@ -686,12 +780,30 @@
         function showInvoice(id) {
             const sale = sales.find(s => s.id == id); if(!sale) return;
             currentInvoiceId = id;
-            document.getElementById('inv-id').innerText = '#' + sale.id; document.getElementById('inv-date').innerText = formatDate(sale.date);
+            document.getElementById('inv-id').innerText = '#' + sale.id; 
+            document.getElementById('inv-date').innerText = formatDate(sale.date);
             let custHTML = `<div>${sale.customer}</div>`; if(sale.customerMobile) custHTML += `<div class="text-xs text-gray-500">Mob: ${sale.customerMobile}</div>`;
             document.getElementById('inv-customer-details').innerHTML = custHTML;
-            document.getElementById('inv-total').innerText = '৳' + sale.total; document.getElementById('inv-method').innerText = sale.paymentMethod;
+            document.getElementById('inv-total').innerText = '৳' + sale.total; 
+            
+            // Determine Paid and Due for Display
+            // If paidAmount exists in object use it, otherwise fallback to logic based on status
+            let paidAmount = 0;
+            if (sale.paidAmount !== undefined) {
+                paidAmount = sale.paidAmount;
+            } else {
+                paidAmount = sale.status === 'Paid' ? sale.total : 0;
+            }
+            const dueAmount = sale.total - paidAmount;
+
+            document.getElementById('inv-paid').innerText = '৳' + paidAmount;
+            document.getElementById('inv-due').innerText = '৳' + (dueAmount > 0 ? dueAmount : 0);
+            
+            document.getElementById('inv-method').innerText = sale.paymentMethod;
             const tbody = document.getElementById('inv-items'); tbody.innerHTML = '';
-            sale.items.forEach(i => { tbody.innerHTML += `<tr><td class="pb-1">${i.name}</td><td class="pb-1 text-center">${i.qty}</td><td class="pb-1 text-right">${i.total}</td></tr>`; });
+            // UPDATED: Added size display here
+            sale.items.forEach(i => { tbody.innerHTML += `<tr><td class="pb-1">${i.name} <span class="text-[10px] text-gray-500">(${i.size || '-'})</span></td><td class="pb-1 text-center">${i.qty}</td><td class="pb-1 text-right">${i.total}</td></tr>`; });
+            
             if(sale.status === 'Due') document.getElementById('btn-pay-due').classList.remove('hidden'); else document.getElementById('btn-pay-due').classList.add('hidden');
             document.getElementById('modal-invoice').classList.add('active');
         }
@@ -766,10 +878,9 @@
             const totalWithdrawals = withdrawals.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
             document.getElementById('acc-total-withdraw').innerText = '৳' + totalWithdrawals.toLocaleString();
 
-            // Net Revenue (Displayed as Main Revenue)
-            // Logic: User requested "withdrawal korle seta total revenue theke bad jabe"
-            const netRevenue = grossRevenue - totalWithdrawals;
-            document.getElementById('acc-revenue').innerText = '৳' + netRevenue.toLocaleString();
+            // Total Sell (Cash) displayed in Accounts Tab
+            const totalSellCash = grossRevenue; 
+            document.getElementById('acc-revenue').innerText = '৳' + totalSellCash.toLocaleString();
 
             // Gross Profit
             let totalCost = 0;
@@ -847,13 +958,11 @@
             const isMonthMatch = (d) => month === 'all' ? true : d.getMonth() === parseInt(month);
             
             let filteredSales = sales.filter(s => { const d = new Date(s.date); return isYearMatch(d) && isMonthMatch(d); });
-            let revenue = 0;
-            sales.forEach(s => {
-                if(s.status === 'Paid') {
-                    const d = s.paidAt ? new Date(s.paidAt) : new Date(s.date);
-                    if(isYearMatch(d) && isMonthMatch(d)) revenue += (parseInt(s.total)||0);
-                }
-            });
+            
+            let totalPaid = 0;
+            let totalDue = 0;
+            let totalGrand = 0;
+
             let filteredWd = withdrawals.filter(w => { const d = new Date(w.date); return isYearMatch(d) && isMonthMatch(d); });
             let totalWd = filteredWd.reduce((acc, w) => acc + (parseInt(w.amount)||0), 0);
 
@@ -865,10 +974,36 @@
             // Render Sales Table
             salesBody.innerHTML = '';
             filteredSales.forEach(s => {
+                // Determine paid vs due for report stats
+                let paid = 0;
+                if (s.paidAmount !== undefined) {
+                    paid = parseFloat(s.paidAmount) || 0;
+                } else {
+                    paid = s.status === 'Paid' ? (parseFloat(s.total) || 0) : 0;
+                }
+                let total = parseFloat(s.total) || 0;
+                let due = total - paid;
+                if(due < 0) due = 0;
+
+                totalPaid += paid;
+                totalDue += due;
+                totalGrand += total;
+
                 const statusBadge = s.status === 'Due' ? '<span class="text-red-500 font-bold">Due</span>' : '<span class="text-green-600">Paid</span>';
-                salesBody.innerHTML += `<tr class="border-b"><td class="p-2">#${s.id}</td><td class="p-2">${formatSimpleDate(s.date)}</td><td class="p-2">${s.customer}<div class="text-[10px] text-gray-400">${s.paymentMethod}</div></td><td class="p-2 text-right"><div>৳${s.total}</div><div class="text-[10px]">${statusBadge}</div></td></tr>`;
+                salesBody.innerHTML += `<tr class="border-b"><td class="py-1 px-2">#${s.id}</td><td class="py-1 px-2">${formatSimpleDate(s.date)}</td><td class="py-1 px-2">${s.customer}<div class="text-[10px] text-gray-400">${s.paymentMethod}</div></td><td class="py-1 px-2 text-right"><div>৳${s.total}</div><div class="text-[10px]">${statusBadge}</div></td></tr>`;
             });
-            if(filteredSales.length === 0) salesBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Created</td></tr>';
+            
+            if(filteredSales.length === 0) {
+                salesBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Sales Created</td></tr>';
+            } else {
+                // Append Grand Total Row
+                salesBody.innerHTML += `
+                    <tr class="bg-gray-200 font-bold border-t border-black">
+                        <td colspan="3" class="py-1 px-2 text-right">Grand Total:</td>
+                        <td class="py-1 px-2 text-right">৳${totalGrand.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
 
             // Render Withdraw Table
             wdBody.innerHTML = '';
@@ -877,8 +1012,11 @@
             });
             if(filteredWd.length === 0) wdBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400">No Withdrawals Found</td></tr>';
             
-            document.getElementById('rpt-total-sales').innerText = '৳' + (revenue - totalWd).toLocaleString(); // Net Revenue displayed in Report
+            // Update Report Stats Grid
+            document.getElementById('rpt-total-sales').innerText = '৳' + totalPaid.toLocaleString();
+            document.getElementById('rpt-total-due').innerText = '৳' + totalDue.toLocaleString();
             document.getElementById('rpt-total-withdraw').innerText = '৳' + totalWd.toLocaleString();
+            
             area.classList.remove('hidden');
         }
         function printReport() { document.body.classList.add('printing-report'); window.print(); setTimeout(() => document.body.classList.remove('printing-report'), 500); }
